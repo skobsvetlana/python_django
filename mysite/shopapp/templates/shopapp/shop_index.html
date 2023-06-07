@@ -1,0 +1,52 @@
+{% extends 'shopapp/base.html' %}
+
+{% block title %}
+    Shop Index
+{% endblock %}
+
+{% block body %}
+    <h1> "{{ greeting_str|capfirst }}" </h1>
+    <div>
+        <ul>
+           {% for name, price in products %}
+                <li>{{ name }} ({{ name|length }}) for {{ price }} $</li>
+                {% if name|length_is:'7' %}
+                    <span>Lucky product!</span>
+                {% endif %}
+            {% empty %}
+                No produts here
+            {% endfor %}
+        </ul>
+    </div>
+    <p>
+        You have {{ num_messages }} message{{ num_messages|pluralize }}.
+    </p>
+    <div>
+        Time running: {{ time_running }}
+    </div>
+
+    <div>
+        {% lorem 3 p random %}
+    </div>
+
+    {% regroup cities by country as country_list %}
+
+    <ul>
+    {% for country in country_list %}
+        <li>{{ country.grouper }}
+        <ul>
+            {% for item in country.list %}
+              <li>{{ item.name }}: {{ item.population }}</li>
+            {% endfor %}
+        </ul>
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}
+
+
+
+
+
+
+
