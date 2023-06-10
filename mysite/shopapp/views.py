@@ -38,6 +38,7 @@ def groups_list(request: HttpRequest):
 
     return render(request, 'shopapp/groups-list.html', context=context)
 
+
 def products_list(request: HttpRequest):
     context = {
         "products": Product.objects.all(),
