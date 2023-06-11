@@ -3,6 +3,11 @@ from django.contrib.auth.models import User
 
 
 class Product(models.Model):
+    class Meta:
+        ordering = ["name", "price"]
+        #verbose_name_plural = "products"
+        #db_table = "tech_products"
+
     name = models.CharField(max_length=100)
     description = models.TextField(null=False, blank=True)
     quantity = models.PositiveIntegerField(default=0)
