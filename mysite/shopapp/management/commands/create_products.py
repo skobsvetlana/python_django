@@ -13,6 +13,9 @@ class Command(BaseCommand):
             ("Laptop", "", 4, 2999, 0),
             ("Desktop", "", 8, 4999, 0),
             ("Smartphone", "", 15, 999, 0),
+            ("Pen", "red", 0, 20, 0),
+            ("Pencil", "blue", 0, 15, 0),
+            ("Notebook", "36 pages", 0, 2, 0)
         ]
 
         for name, description, quantity, price, discount in products:
