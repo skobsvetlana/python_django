@@ -26,6 +26,9 @@ def handle_file_upload(request: HttpRequest) -> HttpResponse:
 
     if request.method == "POST" and request.FILES.get("myfile"):
         myfile = request.FILES["myfile"]
+        context["filename"] = myfile.name
+        context["filesize"] = myfile.size / 1000
+
         if myfile.size / 1000 > 1:
             print("file size = ", myfile.size / 1000, "Mb")
             context["message"] = "Размер файла больше 1 Мб."
