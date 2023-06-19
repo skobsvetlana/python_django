@@ -22,7 +22,9 @@ def user_form(request: HttpRequest) -> HttpResponse:
 
 
 def handle_file_upload(request: HttpRequest) -> HttpResponse:
-    context ={}
+    context = {
+        "message": "Ошибка. Размер файла не должен быть больше 1 Мб.",
+    }
 
     if request.method == "POST" and request.FILES.get("myfile"):
         myfile = request.FILES["myfile"]
@@ -31,11 +33,11 @@ def handle_file_upload(request: HttpRequest) -> HttpResponse:
 
         if myfile.size / 1000 > 1:
             print("file size = ", myfile.size / 1000, "Mb")
-            context["message"] = "Размер файла больше 1 Мб."
         else:
             fs = FileSystemStorage()
             filename = fs.save(myfile.name, myfile)
             print("saved file", filename)
 
     return render(request, "requestdataapp/file-upload.html", context=context)
+
 

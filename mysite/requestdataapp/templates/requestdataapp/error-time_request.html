@@ -1,0 +1,14 @@
+{% extends 'requestdataapp/base.html' %}
+
+{% block title %}
+  Time difference error
+{% endblock %}
+
+{% block body %}
+  <h1>Error</h1>
+<div>
+      <p>  Повторный запрос с вашего ip-адреса можно сделать через {{ time_diff }} секунд.</p>
+</div>
+{% endblock %}
+
+Прошло меньне {{ time_diff }} секунд для повторного запроса с вашего ip-адреса
