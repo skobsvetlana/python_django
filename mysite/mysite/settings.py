@@ -53,6 +53,7 @@ MIDDLEWARE = [
 
     'requestdataapp.middlewares.set_useraent_on_request_middleware',
     'requestdataapp.middlewares.CountRequestMiddleware',
+    'requestdataapp.middlewares.Restrict_num_requests_middleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'
