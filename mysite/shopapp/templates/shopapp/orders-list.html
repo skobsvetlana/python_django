@@ -14,7 +14,8 @@
       <div>
         <p> Order by {% firstof order.user.firstname order.user.username %},
           promocode: <code>{% firstof order.promocode 'no promocode' %}</code>,
-          address: {{ order.delivery_address }}
+          address: {{ order.delivery_address }},
+          date: {{ order.created_at }}
         </p>
         <div>
           Products in order:
@@ -26,7 +27,12 @@
         </ul>
       </div>
     {% endfor %}
-
   {% endif %}
+  </div>
+
+  <div>
+    <a href="{% url 'shopapp:create_order' %}">
+      Create a new order
+    </a>
   </div>
 {% endblock %}
