@@ -25,7 +25,7 @@ class Restrict_num_requests_middleware:
 
     def __call__(self, request: HttpRequest):
         context = {
-            "time_delay": 10
+            "time_delay": 0
         }
         ip_address = request.META["REMOTE_ADDR"]
         print(ip_address)

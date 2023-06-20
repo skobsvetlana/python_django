@@ -9,19 +9,19 @@
   <div>
     <form method='post'>
       {% csrf_token %}
-      <p>
-        <label for="name_id">Full name</label>
-        <input id="name_id" name="name" type="text" maxlength="150">
-      </p>
-      <p>
-        <label for="age">Age</label>
-        <input id="age" name="age" type="number" min="0" max="99">
-      </p>
-      <p>
-        <label for="bio">Bio</label>
-        <textarea name="bio" id="bio" cols="50" rows="7"></textarea>
-      </p>
-
+<!--      <p>-->
+<!--        <label for="name_id">Full name</label>-->
+<!--        <input id="name_id" name="name" type="text" maxlength="150">-->
+<!--      </p>-->
+<!--      <p>-->
+<!--        <label for="age">Age</label>-->
+<!--        <input id="age" name="age" type="number" min="0" max="99">-->
+<!--      </p>-->
+<!--      <p>-->
+<!--        <label for="bio">Bio</label>-->
+<!--        <textarea name="bio" id="bio" cols="50" rows="7"></textarea>-->
+<!--      </p>-->
+      {{ form.as_p }}
       <button type="submit">
         Submit
       </button>

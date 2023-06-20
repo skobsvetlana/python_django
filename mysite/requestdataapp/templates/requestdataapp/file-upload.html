@@ -9,16 +9,17 @@
 
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    <p>
-      <input type="file" name="myfile">
-    </p>
+<!--    <p>-->
+<!--      <input type="file" name="myfile">-->
+<!--    </p>-->
+    {{ form.as_p }}
     <button type="submit">Upload</button>
   </form>
   <div>
-    {% if message %}
-      <p>{{ message }}</p>
-    {% else %}
-      <p>  Файл {{ filename }} загружен. Размер файла {{ filesize }} Mb.</p>
-    {% endif %}
+<!--    {% if message %}-->
+<!--      <p>{{ message }}</p>-->
+<!--    {% else %}-->
+<!--      <p>  Файл {{ filename }} загружен. Размер файла {{ filesize }} Mb.</p>-->
+<!--    {% endif %}-->
   </div>
 {% endblock %}
