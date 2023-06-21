@@ -24,6 +24,9 @@
     </div>
 
   <div>
+      <a href="{% url 'shopapp:update_order' pk=object.pk %}">Update order</a>
+  </div>
+  <div>
     <a href="{% url 'shopapp:orders_list' %}">
       Back to orders
     </a>

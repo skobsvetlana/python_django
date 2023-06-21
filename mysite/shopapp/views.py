@@ -178,20 +178,43 @@ class OrderDetailView(DetailView):
 #     return render(request, 'shopapp/order_list.html', context=context)
 
 
-def create_order(request: HttpRequest) -> HttpResponse:
-    if request.method == "POST":
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            form.save()
-            url = reverse("shopapp:orders_list")
-            return  redirect(url)
-    else:
-        form = OrderForm()
-    context = {
-        "form": form,
-    }
+class OrderUpdateView(UpdateView):
+    #model = Order
+    queryset = (
+        Order.objects
+        .select_related("user")
+        .prefetch_related("products").all()
+    )
+    fields = "delivery_address", "promocode", "user", "products"
+    template_name_suffix = "_update_form"
 
-    return render(request, 'shopapp/create_order.html', context=context)
+    def get_success_url(self):
+        return reverse(
+            "shopapp:order_details",
+            kwargs={"pk": self.object.pk},
+        )
+
+
+class OrderCreateView(CreateView):
+    model = Order
+    fields = "delivery_address", "promocode", "user", "products"
+    success_url = reverse_lazy("shopapp:orders_list")
+
+
+# def create_order(request: HttpRequest) -> HttpResponse:
+#     if request.method == "POST":
+#         form = OrderForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             url = reverse("shopapp:orders_list")
+#             return  redirect(url)
+#     else:
+#         form = OrderForm()
+#     context = {
+#         "form": form,
+#     }
+#
+#     return render(request, 'shopapp/create-order.html', context=context)
 
 
 #def shop_index(request: HttpRequest):
