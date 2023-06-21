@@ -1,9 +1,10 @@
 from timeit import default_timer
 
 from django.http import HttpResponse, HttpRequest
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.models import Group
 from django.views import View
+from django.views.generic import TemplateView, ListView, DetailView
 
 from shopapp.forms import ProductForm, OrderForm, GroupForm
 from shopapp.models import Product, Order
@@ -53,22 +54,44 @@ class GroupsListView(View):
         #return self.get(request)
 
 
-class ProductDetailsView(View):
-    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
-        product = Product.objects.get(pk=pk)
-        context = {
-            "product": product
-        }
-
-        return render(request, 'shopapp/product-details.html', context=context)
+class ProductDetailsView(DetailView):
+    template_name = 'shopapp/product-details.html'
+    model = Product
+    context_object_name = "product"
 
 
-def products_list(request: HttpRequest):
-    context = {
-        "products": Product.objects.all(),
-    }
+# class ProductDetailsView(View):
+#     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+#         #product = Product.objects.get(pk=pk)
+#         product = get_object_or_404(Product, pk=pk)
+#         context = {
+#             "product": product
+#         }
+#
+#         return render(request, 'shopapp/product-details.html', context=context)
 
-    return render(request, 'shopapp/products-list.html', context=context)
+
+class ProductListView(ListView):
+    template_name = 'shopapp/products-list.html'
+    model = Product
+    context_object_name = "products"
+
+
+# class ProductListView(TemplateView):
+#     template_name = 'shopapp/products-list.html'
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context["products"] = Product.objects.all()
+#         return context
+
+
+# def products_list(request: HttpRequest):
+#     context = {
+#         "products": Product.objects.all(),
+#     }
+#
+#     return render(request, 'shopapp/products-list.html', context=context)
 
 
 def create_product(request: HttpRequest) -> HttpResponse:
@@ -93,12 +116,28 @@ def create_product(request: HttpRequest) -> HttpResponse:
     return render(request, 'shopapp/create-product.html', context=context)
 
 
-def orders_list(request: HttpRequest):
-    context = {
-        "orders": Order.objects.select_related("user").prefetch_related("products").all(),
-    }
+class OrderListView(ListView):
+    queryset = (
+        Order.objects
+        .select_related("user")
+        .prefetch_related("products").all()
+    )
 
-    return render(request, 'shopapp/orders-list.html', context=context)
+
+class OrderDetailView(DetailView):
+    queryset = (
+        Order.objects
+        .select_related("user")
+        .prefetch_related("products").all()
+    )
+
+
+# def orders_list(request: HttpRequest):
+#     context = {
+#         "orders": Order.objects.select_related("user").prefetch_related("products").all(),
+#     }
+#
+#     return render(request, 'shopapp/order_list.html', context=context)
 
 
 def create_order(request: HttpRequest) -> HttpResponse:
