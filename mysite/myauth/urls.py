@@ -3,6 +3,8 @@ from django.urls import path
 
 from .views import (
     #login_view,
+    logout_view,
+    MyLogoutView,
     get_cookie_view,
     set_cookie_view,
     get_session_view,
@@ -14,6 +16,8 @@ app_name = "myauth"
 
 urlpatterns = [
     #path("login/", login_view, name="login"),
+    #path("logout/", logout_view, name="logout"),
+    path("logout/", MyLogoutView.as_view(), name="logout"),
     path(
         "login/",
         LoginView.as_view(
