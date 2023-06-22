@@ -163,6 +163,7 @@ class OrderListView(ListView):
 
 
 class OrderDetailView(DetailView):
+    template_name = 'shopapp/order-details.html'
     queryset = (
         Order.objects
         .select_related("user")
@@ -199,6 +200,13 @@ class OrderCreateView(CreateView):
     model = Order
     fields = "delivery_address", "promocode", "user", "products"
     success_url = reverse_lazy("shopapp:orders_list")
+
+
+class OrderDeleteView(DeleteView):
+    model = Order
+    success_url = reverse_lazy("shopapp:orders_list")
+
+
 
 
 # def create_order(request: HttpRequest) -> HttpResponse:
