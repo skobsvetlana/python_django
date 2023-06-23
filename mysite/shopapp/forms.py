@@ -1,19 +1,27 @@
-from django import forms
+from django.forms import ModelForm
 from django.core import validators
+from django.contrib.auth.models import Group
 
 from .models import Product, Order
 
 
-class ProductForm(forms.ModelForm):
+class ProductForm(ModelForm):
     class Meta:
         model = Product
         fields = "name", "description", "quantity", "price", "discount"
 
 
-class OrderForm(forms.ModelForm):
+class OrderForm(ModelForm):
     class Meta:
         model = Order
         fields = "delivery_address", "promocode", "user", "products"
+
+
+class GroupForm(ModelForm):
+    class Meta:
+        model = Group
+        fields = "name",
+
 
 
 # class ProductForm(forms.Form):
@@ -28,3 +36,5 @@ class OrderForm(forms.ModelForm):
 #     )
 #     quantity = forms.IntegerField(min_value=0)
 #     price = forms.DecimalField(min_value=0, max_value=10000000, decimal_places=2)
+
+

@@ -12,7 +12,10 @@
   <div>
       {% for product in products %}
         <div>
-          <p> Name: {{ product.name }},
+          <p>
+            <a href="{% url 'shopapp:product_details' pk=product.pk %}">
+              Name: {{ product.name }}
+            </a>
             price: {{ product.price }},
             quantity: {{product.quantity }},
             discount: {% firstof product.discount 'no discount' %}
