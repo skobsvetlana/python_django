@@ -3,12 +3,14 @@ from django.urls import path
 
 from .views import (
     #login_view,
-    logout_view,
+    #logout_view,
     MyLogoutView,
     get_cookie_view,
     set_cookie_view,
     get_session_view,
     set_session_view,
+    UserInfoView,
+    RegisterView,
 )
 
 
@@ -26,6 +28,8 @@ urlpatterns = [
         ),
         name="login"
     ),
+    path("user_info/", UserInfoView.as_view(), name="user_info"),
+    path("register/", RegisterView.as_view(), name="register"),
     path("cookie/get/", get_cookie_view, name="cookie_get"),
     path("cookie/set/", set_cookie_view, name="cookie_set"),
     path("session/get/", get_session_view, name="session_get"),
