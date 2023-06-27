@@ -1,8 +1,9 @@
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LogoutView
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login,logout
+from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView, CreateView
 
@@ -37,7 +38,7 @@ class RegisterView(CreateView):
 class MyLogoutView(LogoutView):
     next_page = reverse_lazy("myauth:login")
 
-
+#@user_passes_test(lambda u: u.is_superuser)
 def set_cookie_view(request: HttpRequest) -> HttpResponse:
     response = HttpResponse("Cookie set")
     response.set_cookie("fizz", "buzz", max_age=3600)
@@ -51,11 +52,13 @@ def get_cookie_view(request: HttpRequest) -> HttpResponse:
     return HttpResponse(f"Cookie value: {value!r}")
 
 
+@permission_required("myauyh.view_profile", raise_exception=True)
 def set_session_view(request: HttpRequest) -> HttpResponse:
     request.session["foobar"] = "spameggs"
     return HttpResponse("Session set!")
 
 
+@login_required
 def get_session_view(request: HttpRequest) -> HttpResponse:
     value = request.session.get("foobar", "default value")
     return HttpResponse(f"Session value: {value!r}")

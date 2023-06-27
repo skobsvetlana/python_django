@@ -14,6 +14,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.PositiveSmallIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
     archived = models.BooleanField(default=False)
 
     # @property
@@ -24,7 +25,7 @@ class Product(models.Model):
     #         return self.description[:50] + "..."
 
     def __str__(self) -> str:
-        return f"Product (pk={self.pk}, name={self.name!r})"
+        return f"Product (pk={self.pk}, name={self.name!r}, price={self.price})"
 
 
 class Order(models.Model):

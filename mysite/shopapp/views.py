@@ -1,8 +1,10 @@
 from timeit import default_timer
 
+from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.models import Group
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -96,9 +98,13 @@ class ProductListView(ListView):
 #     return render(request, 'shopapp/products-list.html', context=context)
 
 
-class ProductCreateView(CreateView):
+class ProductCreateView(UserPassesTestMixin, CreateView):
+    def test_func(self):
+    #     #return self.request.user.groups.filter(name="secret-group").exists()
+        return self.request.user.is_superuser
+
     model = Product
-    fields = "name", "description", "quantity", "price"
+    fields = "name", "description", "quantity", "price", "created_by"
     #form_class = GroupForm
     success_url = reverse_lazy("shopapp:products_list")
 
@@ -154,7 +160,7 @@ class ProductArchiveView(DeleteView):
         return HttpResponseRedirect(success_url)
 
 
-class OrderListView(ListView):
+class OrderListView(LoginRequiredMixin, ListView):
     queryset = (
         Order.objects
         .select_related("user")
@@ -162,7 +168,8 @@ class OrderListView(ListView):
     )
 
 
-class OrderDetailView(DetailView):
+class OrderDetailView(PermissionRequiredMixin, DetailView):
+    permission_required = "shopapp.view_order",
     template_name = 'shopapp/order-details.html'
     queryset = (
         Order.objects
@@ -195,7 +202,7 @@ class OrderUpdateView(UpdateView):
             kwargs={"pk": self.object.pk},
         )
 
-
+# @permission_required("shopapp.add_order", raise_exception=True)
 class OrderCreateView(CreateView):
     model = Order
     fields = "delivery_address", "promocode", "user", "products"
