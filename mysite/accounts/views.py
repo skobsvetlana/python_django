@@ -11,13 +11,13 @@ from .models import Profile
 
 
 class UserInfoView(TemplateView):
-    template_name = "myauth/user-info.html"
+    template_name = "accounts/user-info.html"
 
 
 class RegisterView(CreateView):
     form_class = UserCreationForm
-    template_name = "myauth/register.html"
-    success_url = reverse_lazy("myauth:user_info")
+    template_name = "accounts/register.html"
+    success_url = reverse_lazy("accounts:user_info")
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -36,7 +36,7 @@ class RegisterView(CreateView):
 
 
 class MyLogoutView(LogoutView):
-    next_page = reverse_lazy("myauth:login")
+    next_page = reverse_lazy("accounts:login")
 
 #@user_passes_test(lambda u: u.is_superuser)
 def set_cookie_view(request: HttpRequest) -> HttpResponse:
@@ -52,7 +52,7 @@ def get_cookie_view(request: HttpRequest) -> HttpResponse:
     return HttpResponse(f"Cookie value: {value!r}")
 
 
-@permission_required("myauyh.view_profile", raise_exception=True)
+@permission_required("accounts.view_profile", raise_exception=True)
 def set_session_view(request: HttpRequest) -> HttpResponse:
     request.session["foobar"] = "spameggs"
     return HttpResponse("Session set!")
@@ -72,7 +72,7 @@ def get_session_view(request: HttpRequest) -> HttpResponse:
 #         if request.user.is_authenticated:
 #             return redirect('/admin/')
 #
-#         return render(request, "myauth/login.html")
+#         return render(request, "accounts/login.html")
 #
 #     username = request.POST["username"]
 #     password = request.POST["password"]
@@ -81,13 +81,13 @@ def get_session_view(request: HttpRequest) -> HttpResponse:
 #     if user is not None:
 #         login(request, user)
 #         return redirect('/admin/')
-#     return render(request, "myauth/login.html", {"error": "Invalid login credentials"})
+#     return render(request, "accounts/login.html", {"error": "Invalid login credentials"})
 #
 #
 # def logout_view(request: HttpRequest) -> HttpResponse:
 #     logout(request)
 #
-#     return redirect(reverse("myauth:login"))
+#     return redirect(reverse("accounts:login"))
 
 
 

@@ -63,45 +63,15 @@ class ProductDetailsView(DetailView):
     context_object_name = "product"
 
 
-# class ProductDetailsView(View):
-#     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
-#         #product = Product.objects.get(pk=pk)
-#         product = get_object_or_404(Product, pk=pk)
-#         context = {
-#             "product": product
-#         }
-#
-#         return render(request, 'shopapp/product-details.html', context=context)
-
-
-class ProductListView(ListView):
+class ProductListView(LoginRequiredMixin, ListView):
     template_name = 'shopapp/products-list.html'
     #model = Product
     context_object_name = "products"
     queryset = Product.objects.filter(archived=False)
 
 
-# class ProductListView(TemplateView):
-#     template_name = 'shopapp/products-list.html'
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context["products"] = Product.objects.all()
-#         return context
-
-
-# def products_list(request: HttpRequest):
-#     context = {
-#         "products": Product.objects.all(),
-#     }
-#
-#     return render(request, 'shopapp/products-list.html', context=context)
-
-
-class ProductCreateView(UserPassesTestMixin, CreateView):
-    def test_func(self):
-    #     #return self.request.user.groups.filter(name="secret-group").exists()
-        return self.request.user.is_superuser
+class ProductCreateView(PermissionRequiredMixin, CreateView):
+    permission_required = "shopapp.view_product", "shopapp.add_product",
 
     model = Product
     fields = "name", "description", "quantity", "price", "created_by"
@@ -109,29 +79,8 @@ class ProductCreateView(UserPassesTestMixin, CreateView):
     success_url = reverse_lazy("shopapp:products_list")
 
 
-# def create_product(request: HttpRequest) -> HttpResponse:
-#     if request.method == "POST":
-#         form = ProductForm(request.POST)
-#         if form.is_valid():
-#             '''# name = form.cleaned_data["name"]
-#             # description = form.cleaned_data["description"]
-#             # quantity = form.cleaned_data["quantity"]
-#             # price = form.cleaned_data["price"]
-#             # Product.objects.create(name=name, description=description, quantity=quantity, price=price)
-#             #Product.objects.create(**form.cleaned_data)'''
-#             form.save()
-#             url = reverse("shopapp:products_list")
-#             return  redirect(url)
-#     else:
-#         form = ProductForm()
-#     context = {
-#         "form": form,
-#     }
-#
-#     return render(request, 'shopapp/create-product.html', context=context)
-
-
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(PermissionRequiredMixin, UpdateView):
+    permission_required = "shopapp.view_product", "shopapp.change_product",
     model = Product
     fields = "name", "description", "quantity", "price", "discount", "archived"
     template_name_suffix = "_update_form"
@@ -143,12 +92,14 @@ class ProductUpdateView(UpdateView):
         )
 
 
-class ProductDeleteView(DeleteView):
+class ProductDeleteView(PermissionRequiredMixin, DeleteView):
+    permission_required = "shopapp.view_product", "shopapp.delete_product",
     model = Product
     success_url = reverse_lazy("shopapp:products_list")
 
 
-class ProductArchiveView(DeleteView):
+class ProductArchiveView(PermissionRequiredMixin, DeleteView):
+    permission_required = "shopapp.view_product", "shopapp.delete_product",
     model = Product
     success_url = reverse_lazy("shopapp:products_list")
     template_name_suffix = "_confirm_archive_form"
@@ -178,15 +129,8 @@ class OrderDetailView(PermissionRequiredMixin, DetailView):
     )
 
 
-# def orders_list(request: HttpRequest):
-#     context = {
-#         "orders": Order.objects.select_related("user").prefetch_related("products").all(),
-#     }
-#
-#     return render(request, 'shopapp/order_list.html', context=context)
-
-
-class OrderUpdateView(UpdateView):
+class OrderUpdateView(PermissionRequiredMixin, UpdateView):
+    permission_required = "shopapp.view_order", "shopapp.change_order"
     #model = Order
     queryset = (
         Order.objects
@@ -202,18 +146,91 @@ class OrderUpdateView(UpdateView):
             kwargs={"pk": self.object.pk},
         )
 
-# @permission_required("shopapp.add_order", raise_exception=True)
-class OrderCreateView(CreateView):
+
+class OrderCreateView(PermissionRequiredMixin, CreateView):
+    permission_required = "shopapp.view_order", "shopapp.add_order"
     model = Order
     fields = "delivery_address", "promocode", "user", "products"
     success_url = reverse_lazy("shopapp:orders_list")
 
 
-class OrderDeleteView(DeleteView):
+class OrderDeleteView(PermissionRequiredMixin, DeleteView):
+    permission_required = "shopapp.view_order", "shopapp.delete_orderr"
     model = Order
     success_url = reverse_lazy("shopapp:orders_list")
 
 
+
+
+
+
+# class ProductListView(TemplateView):
+#     template_name = 'shopapp/products-list.html'
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context["products"] = Product.objects.all()
+#         return context
+
+
+# def products_list(request: HttpRequest):
+#     context = {
+#         "products": Product.objects.all(),
+#     }
+#
+#     return render(request, 'shopapp/products-list.html', context=context)
+
+
+# class ProductDetailsView(View):
+#     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+#         #product = Product.objects.get(pk=pk)
+#         product = get_object_or_404(Product, pk=pk)
+#         context = {
+#             "product": product
+#         }
+#
+#         return render(request, 'shopapp/product-details.html', context=context)
+
+
+# class ProductCreateView(UserPassesTestMixin, CreateView):
+#     def test_func(self):
+#     #     #return self.request.user.groups.filter(name="secret-group").exists()
+#         return self.request.user.is_superuser
+#
+#     model = Product
+#     fields = "name", "description", "quantity", "price", "created_by"
+#     #form_class = GroupForm
+#     success_url = reverse_lazy("shopapp:products_list")
+
+
+# def create_product(request: HttpRequest) -> HttpResponse:
+#     if request.method == "POST":
+#         form = ProductForm(request.POST)
+#         if form.is_valid():
+#             '''# name = form.cleaned_data["name"]
+#             # description = form.cleaned_data["description"]
+#             # quantity = form.cleaned_data["quantity"]
+#             # price = form.cleaned_data["price"]
+#             # Product.objects.create(name=name, description=description, quantity=quantity, price=price)
+#             #Product.objects.create(**form.cleaned_data)'''
+#             form.save()
+#             url = reverse("shopapp:products_list")
+#             return  redirect(url)
+#     else:
+#         form = ProductForm()
+#     context = {
+#         "form": form,
+#     }
+#
+#     return render(request, 'shopapp/create-product.html', context=context)
+
+
+# def orders_list(request: HttpRequest):
+#     context = {
+#         "orders": Order.objects.select_related("user").prefetch_related("products").all(),
+#     }
+#
+#     return render(request, 'shopapp/order_list.html', context=context)
 
 
 # def create_order(request: HttpRequest) -> HttpResponse:

@@ -14,7 +14,7 @@ from .views import (
 )
 
 
-app_name = "myauth"
+app_name = "accounts"
 
 urlpatterns = [
     #path("login/", login_view, name="login"),
@@ -23,7 +23,7 @@ urlpatterns = [
     path(
         "login/",
         LoginView.as_view(
-            template_name="myauth/login.html",
+            template_name="accounts/login.html",
             redirect_authenticated_user=True,
         ),
         name="login"

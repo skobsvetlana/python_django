@@ -19,6 +19,7 @@
             price: {{ product.price }},
             quantity: {{product.quantity }},
             discount: {% firstof product.discount 'no discount' %}
+            created by: {{ product.created_by }}
           </p>
         </div>
       {% endfor %}
