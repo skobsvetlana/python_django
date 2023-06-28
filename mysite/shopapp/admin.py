@@ -36,6 +36,7 @@ class ProductAdmin(admin.ModelAdmin, ExportAsCSVMixin):
     list_display_links = "pk", "name"
     ordering = "-name", "pk"
     search_fields = "name", "description", "price"
+    #readonly_fields = ["created_by", "created_at"]
     fieldsets = [
         (None, {
             "fields": ("name", "description"),
@@ -57,9 +58,11 @@ class ProductAdmin(admin.ModelAdmin, ExportAsCSVMixin):
         else:
             return obj.description[:50] + "..."
 
-    def save_model(self, request, obj, form, change):
-        obj.created_by = request.user
-        super().save_model(request, obj, form, change)
+    # def save_model(self, request, obj, form, change):
+    #     obj.created_by = request.user
+    #     super().save_model(request, obj, form, change)
+
+
 
 #admin.site.register(Product, ProductAdmin)
 

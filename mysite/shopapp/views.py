@@ -57,7 +57,7 @@ class GroupsListView(View):
         #return self.get(request)
 
 
-class ProductDetailsView(DetailView):
+class ProductDetailsView(LoginRequiredMixin, DetailView):
     template_name = 'shopapp/product-details.html'
     model = Product
     context_object_name = "product"
@@ -72,15 +72,21 @@ class ProductListView(LoginRequiredMixin, ListView):
 
 class ProductCreateView(PermissionRequiredMixin, CreateView):
     permission_required = "shopapp.view_product", "shopapp.add_product",
+    template_name = 'shopapp/create-product.html'
 
     model = Product
-    fields = "name", "description", "quantity", "price", "created_by"
+    fields = "name", "description", "quantity", "price"
     #form_class = GroupForm
     success_url = reverse_lazy("shopapp:products_list")
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
 
 
 class ProductUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = "shopapp.view_product", "shopapp.change_product",
+    template_name = 'shopapp/product_update_form.html'
     model = Product
     fields = "name", "description", "quantity", "price", "discount", "archived"
     template_name_suffix = "_update_form"
@@ -93,16 +99,18 @@ class ProductUpdateView(PermissionRequiredMixin, UpdateView):
 
 
 class ProductDeleteView(PermissionRequiredMixin, DeleteView):
+    template_name = 'shopapp/product_confirm_delete.html'
     permission_required = "shopapp.view_product", "shopapp.delete_product",
     model = Product
     success_url = reverse_lazy("shopapp:products_list")
 
 
 class ProductArchiveView(PermissionRequiredMixin, DeleteView):
+    template_name = 'shopapp/product_confirm_archive_form.html'
     permission_required = "shopapp.view_product", "shopapp.delete_product",
     model = Product
     success_url = reverse_lazy("shopapp:products_list")
-    template_name_suffix = "_confirm_archive_form"
+    #template_name_suffix = "_confirm_archive_form"
 
     def form_valid(self, form):
         success_url = self.get_success_url()
@@ -112,6 +120,7 @@ class ProductArchiveView(PermissionRequiredMixin, DeleteView):
 
 
 class OrderListView(LoginRequiredMixin, ListView):
+    template_name = 'shopapp/order_list.html'
     queryset = (
         Order.objects
         .select_related("user")

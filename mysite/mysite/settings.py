@@ -41,7 +41,7 @@ INSTALLED_APPS = [
 
     'shopapp.apps.ShopappConfig',
     'requestdataapp.apps.RequestdataappConfig',
-    'accounts.apps.MyauthConfig',
+    'accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [
@@ -130,4 +130,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = reverse_lazy("accounts:user_info")
 LOGIN_URL = reverse_lazy("accounts:login")
 
-#AUTH_USER_MODEL = 'accounts.CustomUser'
+#AUTH_USER_MODEL = 'auth.User'
