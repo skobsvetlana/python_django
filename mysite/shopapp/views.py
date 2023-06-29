@@ -9,8 +9,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.views import View
-from django.contrib import messages
-from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView, RedirectView
+from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from shopapp.forms import ProductForm, OrderForm, GroupForm
 from shopapp.models import Product, Order
