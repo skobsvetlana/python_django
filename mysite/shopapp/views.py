@@ -1,19 +1,23 @@
+from time import sleep
 from timeit import default_timer
 
 from django.contrib.auth.decorators import permission_required
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, Http404, HttpResponseForbidden
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.models import Group
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib import messages
+from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView, RedirectView
 
 from shopapp.forms import ProductForm, OrderForm, GroupForm
 from shopapp.models import Product, Order
 
+
 class ShopIndexView(View):
-    def get(self, request: HttpRequest) ->HttpResponse:
+    def get(self, request: HttpRequest) -> HttpResponse:
         products = [
             ('Laptop', 1999),
             ('Desktop', 2999),
@@ -40,7 +44,7 @@ class ShopIndexView(View):
 
 
 class GroupsListView(View):
-    def get(self, request: HttpRequest) ->HttpResponse:
+    def get(self, request: HttpRequest) -> HttpResponse:
         context = {
             "form": GroupForm(),
             "groups": Group.objects.prefetch_related('permissions').all(),
@@ -54,7 +58,7 @@ class GroupsListView(View):
             form.save()
 
         return redirect(request.path)
-        #return self.get(request)
+        # return self.get(request)
 
 
 class ProductDetailsView(LoginRequiredMixin, DetailView):
@@ -65,7 +69,7 @@ class ProductDetailsView(LoginRequiredMixin, DetailView):
 
 class ProductListView(LoginRequiredMixin, ListView):
     template_name = 'shopapp/products-list.html'
-    #model = Product
+    # model = Product
     context_object_name = "products"
     queryset = Product.objects.filter(archived=False)
 
@@ -76,7 +80,7 @@ class ProductCreateView(PermissionRequiredMixin, CreateView):
 
     model = Product
     fields = "name", "description", "quantity", "price"
-    #form_class = GroupForm
+    # form_class = GroupForm
     success_url = reverse_lazy("shopapp:products_list")
 
     def form_valid(self, form):
@@ -84,8 +88,8 @@ class ProductCreateView(PermissionRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ProductUpdateView(PermissionRequiredMixin, UpdateView):
-    permission_required = "shopapp.view_product", "shopapp.change_product",
+class ProductUpdateView(UpdateView):
+    # permission_required = "shopapp.view_product", "shopapp.change_product",
     template_name = 'shopapp/product_update_form.html'
     model = Product
     fields = "name", "description", "quantity", "price", "discount", "archived"
@@ -94,8 +98,26 @@ class ProductUpdateView(PermissionRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse(
             "shopapp:product_details",
-            kwargs={"pk":self.object.pk},
+            kwargs={"pk": self.object.pk},
         )
+
+    def form_valid(self, form):
+        product = get_object_or_404(Product, pk=self.object.pk)
+        user = self.request.user
+        if user == product.created_by or user.is_superuser:
+            return super().form_valid(form)
+        else:
+            #return redirect(request.path)
+            return redirect("shopapp:error_no_permission")
+
+
+class ErrorView(View):
+    def get(self, request: HttpRequest) -> HttpResponse:
+        context = {
+
+        }
+
+        return render(request, 'shopapp/error_no_permission.html', context=context)
 
 
 class ProductDeleteView(PermissionRequiredMixin, DeleteView):
@@ -110,7 +132,8 @@ class ProductArchiveView(PermissionRequiredMixin, DeleteView):
     permission_required = "shopapp.view_product", "shopapp.delete_product",
     model = Product
     success_url = reverse_lazy("shopapp:products_list")
-    #template_name_suffix = "_confirm_archive_form"
+
+    # template_name_suffix = "_confirm_archive_form"
 
     def form_valid(self, form):
         success_url = self.get_success_url()
@@ -140,7 +163,7 @@ class OrderDetailView(PermissionRequiredMixin, DetailView):
 
 class OrderUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = "shopapp.view_order", "shopapp.change_order"
-    #model = Order
+    # model = Order
     queryset = (
         Order.objects
         .select_related("user")
@@ -167,11 +190,6 @@ class OrderDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = "shopapp.view_order", "shopapp.delete_orderr"
     model = Order
     success_url = reverse_lazy("shopapp:orders_list")
-
-
-
-
-
 
 # class ProductListView(TemplateView):
 #     template_name = 'shopapp/products-list.html'
@@ -258,8 +276,8 @@ class OrderDeleteView(PermissionRequiredMixin, DeleteView):
 #     return render(request, 'shopapp/create-order.html', context=context)
 
 
-#def shop_index(request: HttpRequest):
-    # print(request.path)
-    # print(request.method)
-    # print(request.headers)
-    #return HttpResponse("<h1>Hello!!!</h1>")
+# def shop_index(request: HttpRequest):
+# print(request.path)
+# print(request.method)
+# print(request.headers)
+# return HttpResponse("<h1>Hello!!!</h1>")
