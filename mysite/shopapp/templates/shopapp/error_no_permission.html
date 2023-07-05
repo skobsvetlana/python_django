@@ -1,0 +1,14 @@
+{% extends 'shopapp/base.html' %}
+
+{% block title %}
+    No permission
+{% endblock %}
+
+{% block body %}
+  <h1>You have no permission to update the product.</h1>
+    <br><br>
+    <div>
+        <a href="{% url 'shopapp:products_list' %}">Back to products list</a>
+    </div>
+
+{% endblock %}
