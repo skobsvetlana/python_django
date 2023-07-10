@@ -1,0 +1,86 @@
+[
+  {
+    "model": "shopapp.product",
+    "pk": 1,
+    "fields": {
+      "name": "Laptop",
+      "description": "Dolore asperiores exercitationem rem corrupti aut maiores, veritatis sapiente similique quos ipsum totam sit assumenda eveniet, placeat delectus amet eveniet autem tempore sint quis harum, nemo iusto in expedita, id corrupti ducimus natus placeat at minus ratione delectus perferendis minima. Voluptatem veritatis excepturi reprehenderit vel iste laboriosam soluta voluptas, asperiores magni neque dolorem ut deserunt ex vero numquam est nulla repudiandae. Porro ad iusto, cumque officia necessitatibus blanditiis, labore autem corrupti dolor molestiae aspernatur repudiandae quis?",
+      "quantity": 5,
+      "price": "2999.00",
+      "discount": 0,
+      "created_at": "2023-07-05T10:07:45.027Z",
+      "created_by": 2,
+      "archived": false
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 2,
+    "fields": {
+      "name": "Notebook",
+      "description": "36 pages",
+      "quantity": 0,
+      "price": "7.99",
+      "discount": 0,
+      "created_at": "2023-07-05T10:09:11.937Z",
+      "created_by": 2,
+      "archived": true
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 3,
+    "fields": {
+      "name": "Desktop",
+      "description": "Mackbook",
+      "quantity": 3,
+      "price": "4999.00",
+      "discount": 0,
+      "created_at": "2023-07-05T10:09:46.462Z",
+      "created_by": 2,
+      "archived": false
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 4,
+    "fields": {
+      "name": "Wine glasses",
+      "description": "6 items",
+      "quantity": 10,
+      "price": "299.00",
+      "discount": 0,
+      "created_at": "2023-07-05T10:11:40.934Z",
+      "created_by": 3,
+      "archived": false
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 5,
+    "fields": {
+      "name": "Cup",
+      "description": "Blue",
+      "quantity": 2,
+      "price": "149.99",
+      "discount": 0,
+      "created_at": "2023-07-05T12:47:03.495Z",
+      "created_by": 3,
+      "archived": false
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 6,
+    "fields": {
+      "name": "Glass",
+      "description": "Blue",
+      "quantity": 10,
+      "price": "25.99",
+      "discount": 0,
+      "created_at": "2023-07-05T14:28:17.143Z",
+      "created_by": 3,
+      "archived": false
+    }
+  }
+]

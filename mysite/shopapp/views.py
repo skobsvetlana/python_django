@@ -1,9 +1,7 @@
 from time import sleep
 from timeit import default_timer
 
-from django.contrib.auth.decorators import permission_required
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, Http404, HttpResponseForbidden
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.models import Group
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
@@ -141,6 +139,24 @@ class ProductArchiveView(PermissionRequiredMixin, DeleteView):
         return HttpResponseRedirect(success_url)
 
 
+class ProductsDataExportView(View):
+    def get(self, request: HttpRequest) -> JsonResponse:
+        products = Product.objects.order_by("pk").all()
+        products_data = [
+            {
+                "pk": product.pk,
+                "name": product.name,
+                "description": product.description,
+                "quantity": product.quantity,
+                "price": str(product.price),
+                "archived": product.archived,
+            }
+            for product in products
+        ]
+        return JsonResponse({"products": products_data})
+
+
+
 class OrderListView(LoginRequiredMixin, ListView):
     template_name = 'shopapp/order_list.html'
     queryset = (
@@ -153,6 +169,7 @@ class OrderListView(LoginRequiredMixin, ListView):
 class OrderDetailView(PermissionRequiredMixin, DetailView):
     permission_required = "shopapp.view_order",
     template_name = 'shopapp/order-details.html'
+    context_object_name = "order"
     queryset = (
         Order.objects
         .select_related("user")

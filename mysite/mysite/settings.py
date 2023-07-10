@@ -53,7 +53,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'requestdataapp.middlewares.set_useraent_on_request_middleware',
+    #'requestdataapp.middlewares.set_useraent_on_request_middleware',
     'requestdataapp.middlewares.CountRequestMiddleware',
     'requestdataapp.middlewares.Restrict_num_requests_middleware',
 ]
