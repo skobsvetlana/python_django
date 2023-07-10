@@ -2,6 +2,7 @@ import json
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User, Permission
+from django.db.models import QuerySet
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.conf import settings
@@ -131,7 +132,7 @@ class ProductsExportViewTestCase(TestCase):
         'user_groups-fixture.json',
     ]
 
-    def test_getPproducts_view(self):
+    def test_get_products_view(self):
         response = self.client.get(
             reverse("shopapp:products_export"),
         )
@@ -221,4 +222,63 @@ class OrderDetailViewTestCase(TestCase):
         self.assertContains(response, self.order.promocode)
         self.assertEqual(self.order.pk, response.context["order"].pk)
 
+
+class OrdersExportViewTestCase(TestCase):
+    fixtures = [
+        'products-fixture.json',
+        'orders-fixture.json',
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        cls.user_staff = User.objects.create(
+            username="test_staff",
+            password="test1234",
+        )
+        cls.user_staff.is_staff = True
+        cls.user_staff.save()
+        cls.user_not_staff = User.objects.create(
+            username="test_not_staff",
+            password="test1234",
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.user_staff.delete()
+        cls.user_not_staff.delete()
+
+    def setUp(self) -> None:
+        self.client.force_login(self.user_staff)
+
+    def test_orders_view(self):
+        response = self.client.get(reverse("shopapp:orders_export"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Orders export")
+
+    def test_orders_view_content(self):
+        self.client.logout()
+        self.client.force_login(self.user_staff)
+        response = self.client.get(
+            reverse("shopapp:orders_export"),
+        )
+        orders = Order.objects.order_by("pk").select_related("user").prefetch_related("products").all()
+        export_orders_data = response.context['export_orders']
+        print("orders", orders)
+        print("response.context", export_orders_data)
+        self.assertQuerysetEqual(
+            export_orders_data,
+            orders
+        )
+        self.assertQuerySetEqual(
+            qs=orders,
+            values=(p.pk for p in export_orders_data),
+            transform=lambda p: p.pk,
+        )
+
+    def test_orders_view_not_is_staff(self):
+        self.client.logout()
+        self.client.force_login(self.user_not_staff)
+
+        response = self.client.get(reverse("shopapp:orders_export"))
+        self.assertEqual(response.status_code, 403)
 

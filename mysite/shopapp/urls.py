@@ -19,6 +19,7 @@ from shopapp.views import (
     OrderDeleteView,
     ErrorView,
     ProductsDataExportView,
+    OrdersExportView,
 )
 
 app_name = "shopapp"
@@ -42,4 +43,5 @@ urlpatterns = [
     path("orders/<int:pk>/update/", OrderUpdateView.as_view(), name="update_order"),
     path("orders/<int:pk>/delete/", OrderDeleteView.as_view(), name="delete_order"),
     path("errors/", ErrorView.as_view(), name="error_no_permission"),
+    path("orders/export/", OrdersExportView.as_view(), name="orders_export"),
 ]

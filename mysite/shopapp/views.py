@@ -207,6 +207,28 @@ class OrderDeleteView(PermissionRequiredMixin, DeleteView):
     model = Order
     success_url = reverse_lazy("shopapp:orders_list")
 
+
+class OrdersExportView(UserPassesTestMixin, ListView):
+    template_name = 'shopapp/order-export.html'
+    context_object_name = "export_orders"
+    queryset = (
+        Order.objects
+        .order_by("pk")
+        .select_related("user")
+        .prefetch_related("products").all()
+    )
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    # def get_queryset(self) -> HttpResponse:
+    #     orders = Order.objects.order_by("pk").select_related("user").prefetch_related("products").all()
+
+
+
+
+
+
 # class ProductListView(TemplateView):
 #     template_name = 'shopapp/products-list.html'
 #
