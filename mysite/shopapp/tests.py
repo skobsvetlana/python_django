@@ -13,10 +13,12 @@ from shopapp.utils import add_two_numbers
 from string import ascii_letters
 from random import choices
 
+
 class AddTwoNumbers(TestCase):
     def test_add_two_numbers(self):
         result = add_two_numbers(2, 3)
         self.assertEqual(result, 5)
+
 
 class ProductCreateViewTestCase(TestCase):
     fixtures = [
@@ -46,10 +48,6 @@ class ProductCreateViewTestCase(TestCase):
 
 
 class ProductDetailsViewTestCase(TestCase):
-    fixtures = [
-        'user_groups-fixture.json',
-    ]
-
     @classmethod
     def setUpClass(cls):
         cls.user = User.objects.create(
@@ -84,7 +82,7 @@ class ProductDetailsViewTestCase(TestCase):
         self.assertContains(response, self.product.name)
 
 
-class ProductListViewTestCase(TestCase):
+class ProductListViewTestCase(TestCase):  ## dont work
     fixtures = [
         'products-fixture.json',
     ]
@@ -176,7 +174,7 @@ class OrdersListViewTestCase(TestCase):
     def test_orders_view_not_authenticated(self):
         self.client.logout()
         response = self.client.get(reverse("shopapp:orders_list"))
-        #self.assertRedirects(response, str(settings.LOGIN_URL))
+        # self.assertRedirects(response, str(settings.LOGIN_URL))
         self.assertEqual(response.status_code, 302)
         self.assertIn(str(settings.LOGIN_URL), response.url)
 
@@ -223,14 +221,17 @@ class OrderDetailViewTestCase(TestCase):
         self.assertEqual(self.order.pk, response.context["order"].pk)
 
 
-class OrdersExportViewTestCase(TestCase):
+class OrdersExportViewTestCase(TestCase):  ## dont work
     fixtures = [
         'products-fixture.json',
         'orders-fixture.json',
+        "users-fixture.json",
+        'user_groups-fixture.json',
     ]
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
         cls.user_staff = User.objects.create(
             username="test_staff",
             password="test1234",
@@ -244,36 +245,50 @@ class OrdersExportViewTestCase(TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        super().tearDownClass()
         cls.user_staff.delete()
         cls.user_not_staff.delete()
 
     def setUp(self) -> None:
+        # self.user_staff = User.objects.create(
+        #     username="test_staff",
+        #     password="test1234",
+        # )
+        # self.user_staff.is_staff = True
+        # self.user_staff.save()
+        # self.user_not_staff = User.objects.create(
+        #     username="test_not_staff",
+        #     password="test1234",
+        # )
         self.client.force_login(self.user_staff)
 
     def test_orders_view(self):
         response = self.client.get(reverse("shopapp:orders_export"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Orders export")
+        # self.assertContains(response, "Orders export")
 
     def test_orders_view_content(self):
-        self.client.logout()
-        self.client.force_login(self.user_staff)
         response = self.client.get(
             reverse("shopapp:orders_export"),
         )
         orders = Order.objects.order_by("pk").select_related("user").prefetch_related("products").all()
-        export_orders_data = response.context['export_orders']
-        print("orders", orders)
+        expected_data = json.dumps(
+            [
+                {
+                    "pk": order.pk,
+                    "delivery_address": order.delivery_address,
+                    "promocode": order.promocode,
+                    "created_at": str(order.created_at),
+                    "user": order.user.username,
+                    "products": [product.pk for product in order.products.all()],
+                }
+                for order in orders
+            ]
+        )
+        export_orders_data = response.json()['orders']
+        print("orders", expected_data)
         print("response.context", export_orders_data)
-        self.assertQuerysetEqual(
-            export_orders_data,
-            orders
-        )
-        self.assertQuerySetEqual(
-            qs=orders,
-            values=(p.pk for p in export_orders_data),
-            transform=lambda p: p.pk,
-        )
+        self.assertJSONEqual(expected_data, export_orders_data)
 
     def test_orders_view_not_is_staff(self):
         self.client.logout()
@@ -281,4 +296,3 @@ class OrdersExportViewTestCase(TestCase):
 
         response = self.client.get(reverse("shopapp:orders_export"))
         self.assertEqual(response.status_code, 403)
-

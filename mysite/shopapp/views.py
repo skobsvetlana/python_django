@@ -211,18 +211,28 @@ class OrderDeleteView(PermissionRequiredMixin, DeleteView):
 class OrdersExportView(UserPassesTestMixin, ListView):
     template_name = 'shopapp/order-export.html'
     context_object_name = "export_orders"
-    queryset = (
-        Order.objects
-        .order_by("pk")
-        .select_related("user")
-        .prefetch_related("products").all()
-    )
 
     def test_func(self):
         return self.request.user.is_staff
 
-    # def get_queryset(self) -> HttpResponse:
-    #     orders = Order.objects.order_by("pk").select_related("user").prefetch_related("products").all()
+    def get_queryset(self):
+        orders = Order.objects.order_by("pk").select_related("user").prefetch_related("products").all()
+        return orders
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> JsonResponse:
+        orders = self.get_queryset()
+        orders_data = [
+            {
+                "pk": order.pk,
+                "delivery_address": order.delivery_address,
+                "promocode": order.promocode,
+                "created_at": str(order.created_at),
+                "user": order.user.username,
+                "products": [product.pk for product in order.products.all()],
+            }
+            for order in orders
+        ]
+        return JsonResponse({"orders": orders_data})
 
 
 
