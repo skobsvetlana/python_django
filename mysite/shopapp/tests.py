@@ -280,7 +280,7 @@ class OrdersExportViewTestCase(TestCase):  ## dont work
                     "promocode": order.promocode,
                     "created_at": str(order.created_at),
                     "user": order.user.username,
-                    "products": [product.pk for product in order.products.all()],
+                    "products": [product.name for product in order.products.all()],
                 }
                 for order in orders
             ]
