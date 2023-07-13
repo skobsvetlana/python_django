@@ -1,9 +1,7 @@
 from time import sleep
 from timeit import default_timer
 
-from django.contrib.auth.decorators import permission_required
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, Http404, HttpResponseForbidden
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.models import Group
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
@@ -87,7 +85,7 @@ class ProductCreateView(PermissionRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(UserPassesTestMixin, UpdateView):
     # permission_required = "shopapp.view_product", "shopapp.change_product",
     template_name = 'shopapp/product_update_form.html'
     model = Product
@@ -99,6 +97,10 @@ class ProductUpdateView(UpdateView):
             "shopapp:product_details",
             kwargs={"pk": self.object.pk},
         )
+
+    def test_func(self):
+        pass
+        #return self.request.user.is_staff
 
     def form_valid(self, form):
         product = get_object_or_404(Product, pk=self.object.pk)
@@ -141,6 +143,24 @@ class ProductArchiveView(PermissionRequiredMixin, DeleteView):
         return HttpResponseRedirect(success_url)
 
 
+class ProductsDataExportView(View):
+    def get(self, request: HttpRequest) -> JsonResponse:
+        products = Product.objects.order_by("pk").all()
+        products_data = [
+            {
+                "pk": product.pk,
+                "name": product.name,
+                "description": product.description,
+                "quantity": product.quantity,
+                "price": str(product.price),
+                "archived": product.archived,
+            }
+            for product in products
+        ]
+        return JsonResponse({"products": products_data})
+
+
+
 class OrderListView(LoginRequiredMixin, ListView):
     template_name = 'shopapp/order_list.html'
     queryset = (
@@ -153,6 +173,7 @@ class OrderListView(LoginRequiredMixin, ListView):
 class OrderDetailView(PermissionRequiredMixin, DetailView):
     permission_required = "shopapp.view_order",
     template_name = 'shopapp/order-details.html'
+    context_object_name = "order"
     queryset = (
         Order.objects
         .select_related("user")
@@ -189,6 +210,38 @@ class OrderDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = "shopapp.view_order", "shopapp.delete_orderr"
     model = Order
     success_url = reverse_lazy("shopapp:orders_list")
+
+
+class OrdersExportView(UserPassesTestMixin, ListView):
+    template_name = 'shopapp/order-export.html'
+    context_object_name = "export_orders"
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get_queryset(self):
+        orders = Order.objects.order_by("pk").select_related("user").prefetch_related("products").all()
+        return orders
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> JsonResponse:
+        orders = self.get_queryset()
+        orders_data = [
+            {
+                "pk": order.pk,
+                "delivery_address": order.delivery_address,
+                "promocode": order.promocode,
+                "created_at": str(order.created_at),
+                "user": order.user.username,
+                "products": [product.name for product in order.products.all()],
+            }
+            for order in orders
+        ]
+        return JsonResponse({"orders": orders_data})
+
+
+
+
+
 
 # class ProductListView(TemplateView):
 #     template_name = 'shopapp/products-list.html'

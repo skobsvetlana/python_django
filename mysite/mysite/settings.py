@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import sys
 from pathlib import Path
 
 from django.urls import reverse_lazy
@@ -53,7 +53,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'requestdataapp.middlewares.set_useraent_on_request_middleware',
+    #'requestdataapp.middlewares.set_useraent_on_request_middleware',
     'requestdataapp.middlewares.CountRequestMiddleware',
     'requestdataapp.middlewares.Restrict_num_requests_middleware',
 ]
@@ -85,8 +85,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        "TEST": {
+            "NAME": "/Users/svetlanaskobeltcyna/PycharmProjects/Skillbox/python_django/mysite/mysite/test_db.sqlite3"
+        }
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
