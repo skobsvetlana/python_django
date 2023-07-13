@@ -85,7 +85,7 @@ class ProductCreateView(PermissionRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(UserPassesTestMixin, UpdateView):
     # permission_required = "shopapp.view_product", "shopapp.change_product",
     template_name = 'shopapp/product_update_form.html'
     model = Product
@@ -97,6 +97,10 @@ class ProductUpdateView(UpdateView):
             "shopapp:product_details",
             kwargs={"pk": self.object.pk},
         )
+
+    def test_func(self):
+        pass
+        #return self.request.user.is_staff
 
     def form_valid(self, form):
         product = get_object_or_404(Product, pk=self.object.pk)
