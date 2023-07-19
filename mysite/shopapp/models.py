@@ -3,6 +3,11 @@ from django.contrib.auth.models import User
 
 from mysite import settings
 
+def product_preview_directory_path(instance: "Product", filename: str) -> str:
+    return "products/product_{pk}/preview/{filename}".format(
+        pk=instance.pk,
+        filename=filename
+    )
 
 class Product(models.Model):
     class Meta:
@@ -18,6 +23,7 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=False)
     archived = models.BooleanField(default=False)
+    preview = models.ImageField(null=True, blank=True, upload_to=product_preview_directory_path)
 
 
     # @property
@@ -32,6 +38,18 @@ class Product(models.Model):
                f"name={self.name!r}, " \
                f"price={self.price}, " \
                f"created_by={self.created_by})"
+
+def product_images_directory_path(instance: "ProductImages", filename: str) -> str:
+    return "products/product_{pk}/images/{filename}".format(
+        pk=instance.product.pk,
+        filename=filename
+    )
+
+
+class ProductImages(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
+    images = models.ImageField(upload_to=product_images_directory_path)
+    description = models.CharField(max_length=200, null=False, blank=True)
 
 
 class Order(models.Model):

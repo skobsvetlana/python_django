@@ -14,6 +14,13 @@
         <p>Last name: {{ user.last_name }}</p>
         <p>Email: {{ user.email }}</p>
         <p>Bio: {{ user.profile.bio }}</p>
+        <div>
+            {% if user.avatar%}
+            <img src="{{ user.avatar.url }}" alt="{{ user.avatar.name }}">
+            {% else %}
+            avatar: no avatar
+            {% endif %}
+        </div>
     {% else %}
         <h2>User is anonymoys</h2>
     {% endif %}

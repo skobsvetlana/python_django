@@ -6,9 +6,10 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse, reverse_lazy
-from django.views.generic import TemplateView, CreateView
+from django.views.generic import TemplateView, CreateView, UpdateView
 from django.views import View
 
+from .forms import UserInfoForm
 from .models import Profile
 
 
@@ -41,12 +42,26 @@ class MyLogoutView(LogoutView):
     next_page = reverse_lazy("accounts:login")
 
 #@user_passes_test(lambda u: u.is_superuser)
+
+
+class UserInfoUpdateView(UpdateView):
+    template_name = 'accounts/user-info-update-form.html'
+    template_name_suffix = "_update_form"
+    model = Profile
+    form_class = UserInfoForm
+
+    def get_success_url(self):
+        return reverse(
+            "accounts:user_info",
+            kwargs={"pk": self.object.pk},
+        )
+
+
 def set_cookie_view(request: HttpRequest) -> HttpResponse:
     response = HttpResponse("Cookie set")
     response.set_cookie("fizz", "buzz", max_age=3600)
 
     return response
-
 
 def get_cookie_view(request: HttpRequest) -> HttpResponse:
     value = request.COOKIES.get("fizz", "default value")

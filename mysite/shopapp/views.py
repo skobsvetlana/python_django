@@ -10,7 +10,7 @@ from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from shopapp.forms import ProductForm, OrderForm, GroupForm
-from shopapp.models import Product, Order
+from shopapp.models import Product, Order, ProductImages
 
 
 class ShopIndexView(View):
@@ -60,7 +60,8 @@ class GroupsListView(View):
 
 class ProductDetailsView(LoginRequiredMixin, DetailView):
     template_name = 'shopapp/product-details.html'
-    model = Product
+    #model = Product
+    queryset = Product.objects.prefetch_related("images")
     context_object_name = "product"
 
 
@@ -76,7 +77,7 @@ class ProductCreateView(PermissionRequiredMixin, CreateView):
     template_name = 'shopapp/create-product.html'
 
     model = Product
-    fields = "name", "description", "quantity", "price"
+    fields = "name", "description", "quantity", "price", "preview"
     # form_class = GroupForm
     success_url = reverse_lazy("shopapp:products_list")
 
@@ -85,11 +86,12 @@ class ProductCreateView(PermissionRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ProductUpdateView(UserPassesTestMixin, UpdateView):
-    # permission_required = "shopapp.view_product", "shopapp.change_product",
+class ProductUpdateView(PermissionRequiredMixin, UpdateView):
+    permission_required = "shopapp.view_product", "shopapp.change_product",
     template_name = 'shopapp/product_update_form.html'
     model = Product
-    fields = "name", "description", "quantity", "price", "discount", "archived"
+    #fields = "name", "description", "quantity", "price", "discount", "archived", "preview"
+    form_class = ProductForm
     template_name_suffix = "_update_form"
 
     def get_success_url(self):
@@ -98,15 +100,21 @@ class ProductUpdateView(UserPassesTestMixin, UpdateView):
             kwargs={"pk": self.object.pk},
         )
 
-    def test_func(self):
-        pass
-        #return self.request.user.is_staff
+    # def test_func(self):
+    #     pass
+    #     #return self.request.user.is_staff
 
     def form_valid(self, form):
         product = get_object_or_404(Product, pk=self.object.pk)
         user = self.request.user
         if user == product.created_by or user.is_superuser:
-            return super().form_valid(form)
+            response = super().form_valid(form)
+            for image in form.files.getlist('images'):
+                ProductImages.objects.create(
+                    product=self.object,
+                    images=image,
+                )
+            return response
         else:
             #return redirect(request.path)
             return redirect("shopapp:error_no_permission")

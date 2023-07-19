@@ -1,4 +1,4 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, ImageField, ClearableFileInput
 from django.core import validators
 from django.contrib.auth.models import Group
 
@@ -8,7 +8,12 @@ from .models import Product, Order
 class ProductForm(ModelForm):
     class Meta:
         model = Product
-        fields = "name", "description", "quantity", "price", "discount"
+        fields = "name", "description", "quantity", "price", "discount", "preview"
+
+    images = ImageField(
+        widget=ClearableFileInput(attrs={"allow_multiple_selected": True}),
+        required=False
+    )
 
 
 class OrderForm(ModelForm):

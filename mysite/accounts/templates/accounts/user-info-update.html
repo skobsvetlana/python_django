@@ -1,0 +1,31 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}
+  About me update
+{% endblock %}
+
+{% block body %}
+    {% if user.is_authenticated %}
+        <h1> User info update</h1>
+
+        <div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {{ form.as_p }}
+
+                <button type="submit">
+                    Update
+                </button>
+            </form>
+        </div>
+
+        <div>
+            <a href="{% url 'accounts:user-info' pk=object.pk %}">
+                Back to product #{{ object.pk }}</a>
+        </div>
+    {% else %}
+        <h2>User is anonymoys</h2>
+    {% endif %}
+
+{% endblock %}
