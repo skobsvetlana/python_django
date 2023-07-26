@@ -1,8 +1,9 @@
-from django.forms import ModelForm, ImageField, ClearableFileInput
+from django.forms import ModelForm, ImageField
 from django.core import validators
 from django.contrib.auth.models import Group
 
 from .models import Product, Order
+from django import forms
 
 
 class ProductForm(ModelForm):
@@ -11,7 +12,7 @@ class ProductForm(ModelForm):
         fields = "name", "description", "quantity", "price", "discount", "preview"
 
     images = ImageField(
-        widget=ClearableFileInput(attrs={"allow_multiple_selected": True}),
+        widget=forms.ClearableFileInput(attrs={"allow_multiple_selected": True}),
         required=False
     )
 

@@ -48,15 +48,15 @@ class MyLogoutView(LogoutView):
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
-    template_name = "accounts/profile_update.html"
-    #model = Profile
+    template_name = "accounts/profile_update_form.html"
+    model = Profile
     #fields = ["user", "bio", "avatar"]
     #success_url = reverse_lazy("accounts:user_info")
     queryset = Profile.objects.all()
     form_class = UserProfileUpdateForm
 
     def get_success_url(self):
-        return reverse("accounts:user_info", kwargs={'pk': self.get_object().id})
+        return reverse("accounts:user_info", kwargs={"pk": self.object.pk})
 
     def get_context_data(self, **kwargs):
         context = super(ProfileUpdateView, self).get_context_data(**kwargs)
@@ -70,7 +70,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         user.first_name = form.cleaned_data['first_name']
         user.save()
         profile.save()
-        return HttpResponseRedirect(reverse("accounts:user_info", kwargs={'pk': self.get_object().id}))
+        return HttpResponseRedirect(reverse("accounts:user_info", kwargs={"pk": self.object.pk}))
 
 
 def set_cookie_view(request: HttpRequest) -> HttpResponse:

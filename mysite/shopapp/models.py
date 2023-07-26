@@ -45,7 +45,6 @@ def product_images_directory_path(instance: "ProductImages", filename: str) -> s
         filename=filename
     )
 
-
 class ProductImages(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
     images = models.ImageField(upload_to=product_images_directory_path)

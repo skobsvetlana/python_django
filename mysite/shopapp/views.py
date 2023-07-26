@@ -92,7 +92,7 @@ class ProductUpdateView(PermissionRequiredMixin, UpdateView):
     model = Product
     #fields = "name", "description", "quantity", "price", "discount", "archived", "preview"
     form_class = ProductForm
-    template_name_suffix = "_update_form"
+    #template_name_suffix = "_update_form"
 
     def get_success_url(self):
         return reverse(
@@ -100,24 +100,19 @@ class ProductUpdateView(PermissionRequiredMixin, UpdateView):
             kwargs={"pk": self.object.pk},
         )
 
-    # def test_func(self):
-    #     pass
-    #     #return self.request.user.is_staff
-
-    def form_valid(self, form):
+    def test_func(self):
         product = get_object_or_404(Product, pk=self.object.pk)
         user = self.request.user
-        if user == product.created_by or user.is_superuser:
-            response = super().form_valid(form)
-            for image in form.files.getlist('images'):
-                ProductImages.objects.create(
-                    product=self.object,
-                    images=image,
-                )
-            return response
-        else:
-            #return redirect(request.path)
-            return redirect("shopapp:error_no_permission")
+        return user == product.created_by or user.is_superuser or user.is_staff
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        for image in form.files.getlist('images'):
+            ProductImages.objects.create(
+                product=self.object,
+                images=image,
+            )
+        return response
 
 
 class ErrorView(View):
