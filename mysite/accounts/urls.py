@@ -31,7 +31,7 @@ urlpatterns = [
         name="login"
     ),
     path("user_info/", UserInfoView.as_view(), name="user_info"),
-    path("user_info/<int:pk>/update/", ProfileUpdateView.as_view(), name="profile_update"),
+    path("user_info//update/", ProfileUpdateView.as_view(), name="profile_update"),
     path("register/", RegisterView.as_view(), name="register"),
 
     path("cookie/get/", get_cookie_view, name="cookie_get"),
