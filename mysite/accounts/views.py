@@ -1,15 +1,18 @@
 import json
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView, CreateView, UpdateView
 from django.views import View
+from django.shortcuts import get_object_or_404
 
-from .forms import UserInfoForm
+from .forms import UserInfoForm, ProfileUpdateForm, UserProfileUpdateForm
 from .models import Profile
 
 
@@ -44,17 +47,30 @@ class MyLogoutView(LogoutView):
 #@user_passes_test(lambda u: u.is_superuser)
 
 
-class UserInfoUpdateView(UpdateView):
-    template_name = 'accounts/user-info-update-form.html'
-    template_name_suffix = "_update_form"
-    model = Profile
-    form_class = UserInfoForm
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+    template_name = "accounts/profile_update.html"
+    #model = Profile
+    #fields = ["user", "bio", "avatar"]
+    #success_url = reverse_lazy("accounts:user_info")
+    queryset = Profile.objects.all()
+    form_class = UserProfileUpdateForm
 
     def get_success_url(self):
-        return reverse(
-            "accounts:user_info",
-            kwargs={"pk": self.object.pk},
-        )
+        return reverse("accounts:user_info", kwargs={'pk': self.get_object().id})
+
+    def get_context_data(self, **kwargs):
+        context = super(ProfileUpdateView, self).get_context_data(**kwargs)
+        context['profile_form'] = UserProfileUpdateForm(instance=self.request.user.userprofile)
+        return context
+
+    def form_valid(self, form):
+        profile = form.save(commit=False)
+        user = profile.user
+        user.last_name = form.cleaned_data['last_name']
+        user.first_name = form.cleaned_data['first_name']
+        user.save()
+        profile.save()
+        return HttpResponseRedirect(reverse("accounts:user_info", kwargs={'pk': self.get_object().id}))
 
 
 def set_cookie_view(request: HttpRequest) -> HttpResponse:
