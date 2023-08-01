@@ -1,31 +1,23 @@
 {% extends 'accounts/base.html' %}
 
 {% block title %}
-  About me update
+  Profile update
 {% endblock %}
 
 {% block body %}
-    {% if user.is_authenticated %}
-        <h1> Update profile </h1>
 
-        <div>
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form.as_p }}
+    <h1> Update profile </h1>
 
-                <button type="submit">
-                    Update
-                </button>
-            </form>
-        </div>
+    <div>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
 
-<!--        <div>-->
-<!--            <a href="{% url 'accounts:profile_update' %}">-->
-<!--                Back to user info #{{ object.pk }}</a>-->
-<!--        </div>-->
-    {% else %}
-        <h2>User is anonymoys</h2>
-    {% endif %}
+            <button type="submit">
+                Update
+            </button>
+        </form>
+    </div>
 
 {% endblock %}
 
