@@ -1,9 +1,11 @@
 import json
+import os
+
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LogoutView
+from django.contrib.auth.views import LogoutView, LoginView
 from django.db import transaction
 from django.http import HttpRequest, HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -13,7 +15,7 @@ from django.views.generic import TemplateView, CreateView, UpdateView
 from django.views import View
 from django.shortcuts import get_object_or_404
 
-from .forms import ProfileUpdateForm, UserUpdateForm
+from .forms import ProfileUpdateForm
 from .models import Profile
 
 
@@ -24,7 +26,7 @@ class UserInfoView(TemplateView):
 class RegisterView(CreateView):
     form_class = UserCreationForm
     template_name = "accounts/register.html"
-    success_url = reverse_lazy("accounts:user_info")
+    success_url = reverse_lazy("accounts:profile_update")
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -42,27 +44,58 @@ class RegisterView(CreateView):
         return response
 
 
+# class MyLoginView(LoginView):
+#     template_name = "accounts/login.html"
+#     redirect_authenticated_user = True
+#     success_url = reverse_lazy("accounts:profile_update")
+#
+#     def form_valid(self, form):
+#         response = super().form_valid(form)
+#
+#         username = form.cleaned_data.get("username")
+#         password = form.cleaned_data.get("password")
+#         user = authenticate(
+#             self.request,
+#             username=username,
+#             password=password,
+#         )
+#         login(request=self.request, user=user)
+#
+#         return redirect(self.get_success_url1(user))
+#
+#     def get_success_url1(self, user):
+#         return reverse_lazy("accounts:profile_update", kwargs={"pk": user.pk})
+
+
 class MyLogoutView(LogoutView):
     next_page = reverse_lazy("accounts:login")
 
+
+
+
+
 #@user_passes_test(lambda u: u.is_superuser)
-
-
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "accounts/profile_update_form.html"
     model = Profile
     form_class = ProfileUpdateForm
-    success_url = reverse_lazy("accounts:user_info")
+    queryset = Profile.objects.all()
+    # success_url = reverse_lazy("accounts:profile_update")
 
     def form_valid(self, form):
+        print(0)
         response = super().form_valid(form)
-        #Profile.objects.update(user=self.object)
-
+        Profile.objects.update(user=self.object)
+        print(2, self.object)
+        #return HttpResponseRedirect(reverse("accounts:profile_update", kwargs={"pk": self.get_object().id}))
         return response
 
+    def get_success_url(self):
+        print(00)
+        print(1, self.object)
+        return reverse_lazy("accounts:profile_update", kwargs={"pk": self.get_object().id})
 
-    # def get_success_url(self):
-    #     return reverse_lazy("accounts:user_info", kwargs={"pk": self.object.pk})
+
 
 
 

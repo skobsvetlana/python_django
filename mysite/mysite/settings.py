@@ -42,7 +42,12 @@ INSTALLED_APPS = [
     'shopapp.apps.ShopappConfig',
     'requestdataapp.apps.RequestdataappConfig',
     'accounts.apps.AccountsConfig',
+    'crispy_forms',
+    'crispy_bootstrap4',
+
 ]
+
+#CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -137,6 +142,7 @@ MEDIA_ROOT = BASE_DIR / 'uploads'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = reverse_lazy("accounts:user_info")
+#LOGIN_REDIRECT_URL = reverse_lazy("accounts:profile_update")
 LOGIN_URL = reverse_lazy("accounts:login")
 
 #AUTH_USER_MODEL = 'auth.User'

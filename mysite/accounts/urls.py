@@ -10,6 +10,7 @@ from .views import (
     get_session_view,
     set_session_view,
     UserInfoView,
+    #MyLoginView,
     ProfileUpdateView,
     RegisterView,
     FooBarView,
@@ -28,10 +29,11 @@ urlpatterns = [
             template_name="accounts/login.html",
             redirect_authenticated_user=True,
         ),
-        name="login"
+    name="login"
     ),
+    #path("login/", MyLoginView.as_view(), name="login"),
     path("user_info/", UserInfoView.as_view(), name="user_info"),
-    path("user_info/<int:pk>/update/", ProfileUpdateView.as_view(), name="profile_update"),
+    path("profile_update/<int:pk>/", ProfileUpdateView.as_view(), name="profile_update"),
     path("register/", RegisterView.as_view(), name="register"),
 
     path("cookie/get/", get_cookie_view, name="cookie_get"),

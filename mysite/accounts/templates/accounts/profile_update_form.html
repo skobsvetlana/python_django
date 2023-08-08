@@ -1,23 +1,40 @@
 {% extends 'accounts/base.html' %}
+{% load crispy_forms_tags %}
 
 {% block title %}
-  Profile update
+  About me
 {% endblock %}
 
 {% block body %}
+    <h1> User info</h1>
 
-    <h1> Update profile </h1>
+    {% if user.is_authenticated %}
+        <h2>Detail</h2>
+        <p>Username: {{ user.username }}</p>
+        <p>First name: {{ user.first_name }}</p>
+        <p>Last name: {{ user.last_name }}</p>
+        <p>Email: {{ user.email }}</p>
+        <div>
+            {% if user.profile.avatar%}
+            <img src="{{ user.profile.avatar.url }}" alt="{{ user.profile.avatar.name }}">
+            {% else %}
+            Avatar: no avatar
+            {% endif %}
+        </div>
+        <br><br>
+        <div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
 
-    <div>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-
-            <button type="submit">
-                Update
-            </button>
-        </form>
-    </div>
+                <button type="submit">
+                    Update
+                </button>
+            </form>
+        </div>
+    {% else %}
+        <h2>User is anonymoys</h2>
+    {% endif %}
 
 {% endblock %}
 
