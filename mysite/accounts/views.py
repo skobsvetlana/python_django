@@ -11,13 +11,14 @@ from django.http import HttpRequest, HttpResponse, JsonResponse, HttpResponseRed
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse, reverse_lazy
-from django.views.generic import TemplateView, CreateView, UpdateView
+from django.views.generic import TemplateView, CreateView, UpdateView, ListView
 from django.views import View
 from django.shortcuts import get_object_or_404
 
-from .forms import ProfileUpdateForm
+from .forms import ProfileUpdateForm, UserUpdateForm
 from .models import Profile
-
+from django.shortcuts import render, redirect
+from django.contrib import messages
 
 class UserInfoView(TemplateView):
     template_name = "accounts/user-info.html"
@@ -44,66 +45,61 @@ class RegisterView(CreateView):
         return response
 
 
-# class MyLoginView(LoginView):
-#     template_name = "accounts/login.html"
-#     redirect_authenticated_user = True
-#     success_url = reverse_lazy("accounts:profile_update")
-#
-#     def form_valid(self, form):
-#         response = super().form_valid(form)
-#
-#         username = form.cleaned_data.get("username")
-#         password = form.cleaned_data.get("password")
-#         user = authenticate(
-#             self.request,
-#             username=username,
-#             password=password,
-#         )
-#         login(request=self.request, user=user)
-#
-#         return redirect(self.get_success_url1(user))
-#
-#     def get_success_url1(self, user):
-#         return reverse_lazy("accounts:profile_update", kwargs={"pk": user.pk})
-
-
 class MyLogoutView(LogoutView):
     next_page = reverse_lazy("accounts:login")
 
 
-
-
-
 #@user_passes_test(lambda u: u.is_superuser)
-class ProfileUpdateView(LoginRequiredMixin, UpdateView):
-    template_name = "accounts/profile_update_form.html"
-    model = Profile
-    form_class = ProfileUpdateForm
-    queryset = Profile.objects.all()
-    # success_url = reverse_lazy("accounts:profile_update")
-
-    def form_valid(self, form):
-        print(0)
-        response = super().form_valid(form)
-        Profile.objects.update(user=self.object)
-        print(2, self.object)
-        #return HttpResponseRedirect(reverse("accounts:profile_update", kwargs={"pk": self.get_object().id}))
-        return response
-
-    def get_success_url(self):
-        print(00)
-        print(1, self.object)
-        #return reverse_lazy("accounts:profile_update", kwargs={"pk": self.get_object().id})
-        return reverse_lazy("accounts:user_info")
 
 
+class ProfileUpdateView(LoginRequiredMixin, View):
+    def get(self, request):
+        print(4)
+
+        # user_form = UserUpdateForm(instance=request.user)
+        profile_form = ProfileUpdateForm(instance=request.user.profile)
+
+        context = {
+            # 'user_form': user_form,
+            'profile_form': profile_form
+        }
+        print(4)
+
+        return render(request, 'accounts/profile_update_form.html', context)
+
+    def post(self, request):
+        user_form = UserUpdateForm(
+            request.POST,
+            instance=request.user
+        )
+        profile_form = ProfileUpdateForm(
+            request.POST,
+            request.FILES,
+            instance=request.user.profile
+        )
+
+        if profile_form.is_valid() and user_form.is_valid():
+            user_form.save()
+            profile_form.save()
+
+            messages.success(request, 'Your profile has been updated successfully')
+            print(1)
+            return redirect('accounts:user_info')
+        else:
+            context = {
+                'user_form': user_form,
+                'profile_form': profile_form
+            }
+            messages.error(request, 'Error updating you profile')
+            print(user_form.is_valid(), profile_form.is_valid())
+
+            return render(request, 'accounts/profile_update_form.html', context)
 
 
-
-
-
-
-
+class UserProfileView(ListView):
+    template_name = 'accounts/users-list.html'
+    context_object_name = "userprofile"
+    queryset = User.objects.all()
 
 
 def set_cookie_view(request: HttpRequest) -> HttpResponse:

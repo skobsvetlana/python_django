@@ -1,0 +1,44 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}
+  Users list
+{% endblock %}
+
+{% block body %}
+    <h1> Users list </h1>
+    {% if not users %}
+    <h3> There is no users yet </h3>
+  {% else %}
+      <div>
+      {% for product in products %}
+        <div>
+          <p>
+            <a href="{% url 'shopapp:product_details' pk=product.pk %}">
+              Name: {{ product.name }}
+            </a>
+            price: {{ product.price }},
+            quantity: {{product.quantity }},
+            discount: {% firstof product.discount 'no discount' %}
+            created by: {{ product.created_by }}
+            {% if product.preview %}
+            <img src="{{ product.preview.url }}" alt="{{ product.preview.name }}">
+            {% else %}
+            preview: no image
+            {% endif %}
+          </p>
+        </div>
+      {% endfor %}
+
+  {% endif %}
+  </div>
+
+    {% if perms.shopapp.add_product %}
+    <div>
+      <a href="{% url 'shopapp:create_product' %}">
+        Create a new product
+      </a>
+    </div>
+  {% endif %}
+
+
+{% endblock %}

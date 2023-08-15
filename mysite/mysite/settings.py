@@ -81,6 +81,10 @@ TEMPLATES = [
     },
 ]
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+"django.contrib.auth.context_processors.auth",
+)
+
 WSGI_APPLICATION = 'mysite.wsgi.application'
 
 # Database
@@ -145,4 +149,5 @@ LOGIN_REDIRECT_URL = reverse_lazy("accounts:user_info")
 #LOGIN_REDIRECT_URL = reverse_lazy("accounts:profile_update")
 LOGIN_URL = reverse_lazy("accounts:login")
 
+AUTH_PROFILE_MODULE = "models.Profile"
 #AUTH_USER_MODEL = 'auth.User'

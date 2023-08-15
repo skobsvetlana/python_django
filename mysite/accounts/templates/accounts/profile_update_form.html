@@ -6,35 +6,32 @@
 {% endblock %}
 
 {% block body %}
-    <h1> Profile update</h1>
+<div class="center">
 
-    {% if user.is_authenticated %}
-        <h2>Detail</h2>
-        <p>Username: {{ user.username }}</p>
-        <p>First name: {{ user.first_name }}</p>
-        <p>Last name: {{ user.last_name }}</p>
-        <p>Email: {{ user.email }}</p>
-        <div>
-            {% if user.profile.avatar%}
-            <img src="{{ user.profile.avatar.url }}" alt="{{ user.profile.avatar.name }}">
-            {% else %}
-            Avatar: no avatar
-            {% endif %}
-        </div>
-        <br><br>
-        <div>
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form.as_p }}
+	<form method="POST" enctype="multipart/form-data" class="card">
+		{% csrf_token %}
 
-                <button type="submit">
-                    Update
-                </button>
-            </form>
-        </div>
-    {% else %}
-        <h2>User is anonymoys</h2>
-    {% endif %}
+	    {% if user.profile %}
+			<img src="{{user.profile.avatar.url}}" alt="{{ user.username }}" class="avatar"  accept=".jpg,.jpeg,.png"/>
+	    {% endif %}
 
-{% endblock %}
+	    <h2 class="text-center">{{ user.username | title }}</h2>
+	    <p class="text-center"><a>{{user.profile.bio}}</a></p>
+   	    <hr>
+			<label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="{{user.username}}" />
 
+
+            <label for="bio">Bio:</label>
+            <input type="text" id="bio" name="bio" value="{{user.profile.bio}}" />
+
+
+		<label for="avatar">Avatar:</label>
+		<input type="file" name="avatar" id="avatar">
+
+	    <button type="submit" class="btn btn-primary full-width">Update Profile</button>
+
+	</form>
+</div>
+
+{% endblock body %}
