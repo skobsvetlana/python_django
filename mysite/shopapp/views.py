@@ -106,12 +106,19 @@ class ProductUpdateView(PermissionRequiredMixin, UpdateView):
         return user == product.created_by or user.is_superuser or user.is_staff
 
     def form_valid(self, form):
-        response = super().form_valid(form)
-        for image in form.files.getlist('images'):
+        #response = super().form_valid(form)
+        # for image in form.files.getlist('images'):
+        #     ProductImages.objects.create(
+        #         product=self.object,
+        #         images=image,
+        #     )
+        files = form.cleaned_data["images"]
+        for f in files:
             ProductImages.objects.create(
-                product=self.object,
-                images=image,
-            )
+                    product=self.object,
+                    images=f,
+                )
+        response = super().form_valid(form)
         return response
 
 
