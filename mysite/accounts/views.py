@@ -51,19 +51,23 @@ class MyLogoutView(LogoutView):
 
 #@user_passes_test(lambda u: u.is_superuser)
 
+class UserListView(LoginRequiredMixin, ListView):
+    template_name = 'accounts/users-list.html'
+    # model = Product
+    context_object_name = "users"
+    queryset = User.objects.select_related("profile")
+
 
 class ProfileUpdateView(LoginRequiredMixin, View):
     def get(self, request):
-        print(4)
 
-        # user_form = UserUpdateForm(instance=request.user)
+        user_form = UserUpdateForm(instance=request.user)
         profile_form = ProfileUpdateForm(instance=request.user.profile)
 
         context = {
-            # 'user_form': user_form,
+            'user_form': user_form,
             'profile_form': profile_form
         }
-        print(4)
 
         return render(request, 'accounts/profile_update_form.html', context)
 
@@ -83,7 +87,7 @@ class ProfileUpdateView(LoginRequiredMixin, View):
             profile_form.save()
 
             messages.success(request, 'Your profile has been updated successfully')
-            print(1)
+
             return redirect('accounts:user_info')
         else:
             context = {
@@ -91,7 +95,6 @@ class ProfileUpdateView(LoginRequiredMixin, View):
                 'profile_form': profile_form
             }
             messages.error(request, 'Error updating you profile')
-            print(user_form.is_valid(), profile_form.is_valid())
 
             return render(request, 'accounts/profile_update_form.html', context)
 

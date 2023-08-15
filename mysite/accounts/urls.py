@@ -15,6 +15,7 @@ from .views import (
     #profile,
     RegisterView,
     FooBarView,
+    UserListView,
 )
 
 
@@ -35,7 +36,7 @@ urlpatterns = [
     #path("login/", MyLoginView.as_view(), name="login"),
     path("user_info/", UserInfoView.as_view(), name="user_info"),
     path("profile_update/", ProfileUpdateView.as_view(), name="profile_update"),
-    #path('update/', profile, name='profile_update'),
+    path("list/", UserListView.as_view(), name="users_list"),
     path("register/", RegisterView.as_view(), name="register"),
 
     path("cookie/get/", get_cookie_view, name="cookie_get"),

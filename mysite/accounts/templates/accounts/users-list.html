@@ -10,20 +10,16 @@
     <h3> There is no users yet </h3>
   {% else %}
       <div>
-      {% for product in products %}
+      {% for user in users %}
         <div>
           <p>
-            <a href="{% url 'shopapp:product_details' pk=product.pk %}">
-              Name: {{ product.name }}
+            <a href="{% url 'accounts:user_info' %}">
+              {{ user.username }}
             </a>
-            price: {{ product.price }},
-            quantity: {{product.quantity }},
-            discount: {% firstof product.discount 'no discount' %}
-            created by: {{ product.created_by }}
-            {% if product.preview %}
-            <img src="{{ product.preview.url }}" alt="{{ product.preview.name }}">
+            {% if user.profile.avatar %}
+            <img src="{{ user.profile.avatar.url }}" alt="{{ user.profile.avatar.name }}">
             {% else %}
-            preview: no image
+            preview: no avatar
             {% endif %}
           </p>
         </div>
@@ -32,13 +28,13 @@
   {% endif %}
   </div>
 
-    {% if perms.shopapp.add_product %}
-    <div>
-      <a href="{% url 'shopapp:create_product' %}">
-        Create a new product
-      </a>
-    </div>
-  {% endif %}
+<!--    {% if perms.shopapp.add_product %}-->
+<!--    <div>-->
+<!--      <a href="{% url 'shopapp:create_product' %}">-->
+<!--        Create a new product-->
+<!--      </a>-->
+<!--    </div>-->
+<!--  {% endif %}-->
 
 
 {% endblock %}
