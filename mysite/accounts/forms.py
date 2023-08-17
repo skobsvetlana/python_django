@@ -17,7 +17,6 @@ class UserUpdateForm(forms.ModelForm):
     """
     Форма обновления данных пользователя
     """
-
     username = forms.CharField(max_length=100,
                                required=True,
                                widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -28,8 +27,6 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('username',)
-
-
 
 
 class ProfileUpdateForm(forms.ModelForm):

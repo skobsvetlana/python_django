@@ -1,0 +1,34 @@
+{% extends 'accounts/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  About me
+{% endblock %}
+
+{% block body %}
+    <h1> Profile </h1>
+        <p>Username: {{ view_profile.username }}</p>
+        <p>First name: {{ view_profile.first_name }}</p>
+        <p>Last name: {{ view_profile.last_name }}</p>
+        <p>Email: {{ view_profile.email }}</p>
+        <p>Bio: {{ view_profile.profile.bio }}</p>
+
+        <div>
+            {% if view_profile.profile.avatar%}
+            <img src="{{ view_profile.profile.avatar.url }}" alt="{{ view_profile.profile.avatar.name }}">
+            {% else %}
+            Avatar: no avatar
+            {% endif %}
+        </div>
+    <br><br>
+    <div>
+        <a href="{% url 'accounts:profile_update' username=view_profile.username%}">
+            Update profile </a>
+    </div>
+    <br>
+    <div>
+        <a href="{% url 'accounts:users_list' %}">
+              Users list </a>
+    </div>
+
+{% endblock %}

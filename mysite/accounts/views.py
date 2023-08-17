@@ -15,7 +15,7 @@ from django.views.generic import TemplateView, CreateView, UpdateView, ListView
 from django.views import View
 from django.shortcuts import get_object_or_404
 
-from .forms import ProfileUpdateForm, UserUpdateForm
+from .forms import ProfileUpdateForm, UserUpdateForm, UserInfoForm
 from .models import Profile
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -51,35 +51,31 @@ class MyLogoutView(LogoutView):
 
 #@user_passes_test(lambda u: u.is_superuser)
 
-class UserListView(LoginRequiredMixin, ListView):
-    template_name = 'accounts/users-list.html'
-    # model = Product
-    context_object_name = "users"
-    queryset = User.objects.select_related("profile")
-
 
 class ProfileUpdateView(LoginRequiredMixin, View):
-    def get(self, request):
-
-        user_form = UserUpdateForm(instance=request.user)
-        profile_form = ProfileUpdateForm(instance=request.user.profile)
+    def get(self, request, *args, **kwargs):
+        change_profile = User.objects.get(username=kwargs["username"])
+        user_form = UserUpdateForm(instance=change_profile)
+        profile_form = ProfileUpdateForm(instance=change_profile)
 
         context = {
             'user_form': user_form,
-            'profile_form': profile_form
+            'profile_form': profile_form,
+            'change_profile': change_profile,
         }
 
         return render(request, 'accounts/profile_update_form.html', context)
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
+        change_profile = User.objects.get(username=kwargs["username"])
         user_form = UserUpdateForm(
             request.POST,
-            instance=request.user
+            instance=change_profile
         )
         profile_form = ProfileUpdateForm(
             request.POST,
             request.FILES,
-            instance=request.user.profile
+            instance=change_profile.profile
         )
 
         if profile_form.is_valid() and user_form.is_valid():
@@ -88,7 +84,7 @@ class ProfileUpdateView(LoginRequiredMixin, View):
 
             messages.success(request, 'Your profile has been updated successfully')
 
-            return redirect('accounts:user_info')
+            return redirect('accounts:userprofile', username=change_profile.username)
         else:
             context = {
                 'user_form': user_form,
@@ -99,10 +95,26 @@ class ProfileUpdateView(LoginRequiredMixin, View):
             return render(request, 'accounts/profile_update_form.html', context)
 
 
-class UserProfileView(ListView):
+class UsersListView(LoginRequiredMixin, ListView):
     template_name = 'accounts/users-list.html'
+    context_object_name = "users"
+    queryset = User.objects.select_related("profile").all()
+
+
+class UserProfileView(View):
+    template_name = 'accounts/other_userprofile.html'
     context_object_name = "userprofile"
-    queryset = User.objects.all()
+    queryset = User.objects.select_related("profile").all()
+
+    def get(self, request, *args, **kwargs):
+        view_profile = User.objects.get(username=kwargs["username"])
+        user_form = UserInfoForm(instance=view_profile)
+        context = {
+            'user_form': user_form,
+            'view_profile': view_profile
+        }
+
+        return render(request, 'accounts/userprofile.html', context)
 
 
 def set_cookie_view(request: HttpRequest) -> HttpResponse:

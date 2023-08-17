@@ -11,19 +11,19 @@
 	<form method="POST" enctype="multipart/form-data" class="card">
 		{% csrf_token %}
 
-	    {% if change_profile.profile %}
-			<img src="{{change_profile.profile.avatar.url}}" alt="{{ change_profile.username }}" class="avatar"  accept=".jpg,.jpeg,.png"/>
+	    {% if user.profile %}
+			<img src="{{user.profile.avatar.url}}" alt="{{ user.username }}" class="avatar"  accept=".jpg,.jpeg,.png"/>
 	    {% endif %}
 
-	    <h2 class="text-center">{{ change_profile.username | title }}</h2>
-	    <p class="text-center"><a>{{change_profile.profile.bio}}</a></p>
+	    <h2 class="text-center">{{ user.username | title }}</h2>
+	    <p class="text-center"><a>{{user.profile.bio}}</a></p>
    	    <hr>
 			<label for="username">Username:</label>
-            <input type="text" id="username" name="username" value="{{change_profile.username}}" />
+            <input type="text" id="username" name="username" value="{{user.username}}" />
 
 
             <label for="bio">Bio:</label>
-            <input type="text" id="bio" name="bio" value="{{change_profile.profile.bio}}" />
+            <input type="text" id="bio" name="bio" value="{{user.profile.bio}}" />
 
 
 		<label for="avatar">Avatar:</label>
