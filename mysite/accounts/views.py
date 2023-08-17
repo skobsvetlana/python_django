@@ -3,7 +3,7 @@ import os
 
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView, LoginView
 from django.db import transaction
@@ -52,7 +52,15 @@ class MyLogoutView(LogoutView):
 #@user_passes_test(lambda u: u.is_superuser)
 
 
-class ProfileUpdateView(LoginRequiredMixin, View):
+class ProfileUpdateView(LoginRequiredMixin,  View):
+    permission_required = 'accounts.change_avatar'
+
+    def test_func(self, *args, **kwargs):
+        user = self.request.user
+        change_profile = User.objects.get(username=kwargs["username"])
+        print(user == change_profile)
+        return user.is_superuser or user.is_staff
+
     def get(self, request, *args, **kwargs):
         change_profile = User.objects.get(username=kwargs["username"])
         user_form = UserUpdateForm(instance=change_profile)

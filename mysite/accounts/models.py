@@ -19,6 +19,10 @@ class Profile(models.Model):
         upload_to=profile_avatar_directory_path,
         verbose_name='Avatar'
     )
+
+    class Meta:
+        permissions = (("change_avatar", "can change avatar of profile"),)
+
     def __str__(self):
         return self.user.username
 
