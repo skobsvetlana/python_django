@@ -145,7 +145,7 @@ MEDIA_ROOT = BASE_DIR / 'uploads'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = reverse_lazy("accounts:user_info")
+LOGIN_REDIRECT_URL = reverse_lazy("accounts:about_me")
 #LOGIN_REDIRECT_URL = reverse_lazy("accounts:profile_update")
 LOGIN_URL = reverse_lazy("accounts:login")
 

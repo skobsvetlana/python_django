@@ -1,0 +1,48 @@
+{% extends 'accounts/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  About me
+{% endblock %}
+
+{% block body %}
+    <h1>About me</h1>
+
+        {% if user.is_authenticated %}
+        <h2>Detail</h2>
+        <p>Username: {{ user.username }}</p>
+        <p>First name: {{ user.first_name }}</p>
+        <p>Last name: {{ user.last_name }}</p>
+        <p>Email: {{ user.email }}</p>
+        <p>Bio: {{ user.profile.bio }}</p>
+        <div>
+            {% if user.profile.avatar%}
+            <img src="{{ user.profile.avatar.url }}" alt="{{ user.profile.avatar.name }}">
+            {% else %}
+            Avatar: no avatar
+            {% endif %}
+
+        </div>
+
+    <div>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button type="submit">
+                Update
+            </button>
+        </form>
+    </div>
+    <br>
+    <div>
+        <a href="{% url 'accounts:users_list' %}">
+              Users list </a>
+    </div>
+
+    {% else %}
+        <h2>User is anonymoys</h2>
+    {% endif %}
+
+{% endblock %}

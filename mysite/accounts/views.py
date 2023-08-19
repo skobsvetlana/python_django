@@ -24,6 +24,17 @@ class UserInfoView(TemplateView):
     template_name = "accounts/user-info.html"
 
 
+class AboutMeView(UpdateView):
+    template_name = "accounts/about-me.html"
+    model = Profile
+    fields = "avatar",
+    success_url = reverse_lazy("accounts:about_me")
+
+    def get_object(self, queryset=None):
+        print("gyygjuh", Profile.objects.get(pk=self.request.user.pk))
+        return Profile.objects.get(pk=self.request.user.pk)
+
+
 class RegisterView(CreateView):
     form_class = UserCreationForm
     template_name = "accounts/register.html"
@@ -53,7 +64,6 @@ class MyLogoutView(LogoutView):
 
 
 class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, View):
-
     #permission_required = 'accounts.change_avatar'
 
     def get(self, request, *args, **kwargs):
