@@ -31,7 +31,6 @@ class AboutMeView(UpdateView):
     success_url = reverse_lazy("accounts:about_me")
 
     def get_object(self, queryset=None):
-        print("gyygjuh", Profile.objects.get(pk=self.request.user.pk))
         return Profile.objects.get(pk=self.request.user.pk)
 
 
@@ -63,55 +62,64 @@ class MyLogoutView(LogoutView):
 #@user_passes_test(lambda u: u.is_superuser)
 
 
-class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, View):
+class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     #permission_required = 'accounts.change_avatar'
+    template_name = "accounts/profile_update_form.html"
+    model = Profile
+    fields = "user", "bio",  "avatar",
+    success_url = reverse_lazy("accounts:profile_update")
 
     def get(self, request, *args, **kwargs):
-        change_profile = User.objects.get(username=kwargs["username"])
-        user_form = UserUpdateForm(instance=change_profile)
-        profile_form = ProfileUpdateForm(instance=change_profile)
+        update_profile = User.objects.get(username=kwargs["username"])
+        # user_form = UserUpdateForm(instance=update_profile)
+        # profile_form = ProfileUpdateForm(instance=update_profile)
 
         context = {
-            'user_form': user_form,
-            'profile_form': profile_form,
-            'change_profile': change_profile,
+            # 'user_form': user_form,
+            # 'profile_form': profile_form,
+            'update_profile': update_profile,
         }
 
         return render(request, 'accounts/profile_update_form.html', context)
 
-    def post(self, request, *args, **kwargs):
-        change_profile = User.objects.get(username=kwargs["username"])
-        user_form = UserUpdateForm(
-            request.POST,
-            instance=change_profile
-        )
-        profile_form = ProfileUpdateForm(
-            request.POST,
-            request.FILES,
-            instance=change_profile.profile
-        )
+    # def post(self, request, *args, **kwargs):
+    #     change_profile = User.objects.get(username=kwargs["username"])
+    #     user_form = UserUpdateForm(
+    #         request.POST,
+    #         instance=change_profile
+    #     )
+    #     profile_form = ProfileUpdateForm(
+    #         request.POST,
+    #         request.FILES,
+    #         instance=change_profile.profile
+    #     )
+    #
+    #     if profile_form.is_valid() and user_form.is_valid():
+    #         user_form.save()
+    #         profile_form.save()
+    #
+    #         messages.success(request, 'Your profile has been updated successfully')
+    #
+    #         return redirect('accounts:userprofile', username=change_profile.username)
+    #     else:
+    #         context = {
+    #             'user_form': user_form,
+    #             'profile_form': profile_form
+    #         }
+    #         messages.error(request, 'Error updating you profile')
+    #
+    #         return render(request, 'accounts/profile_update_form.html', context)
 
-        if profile_form.is_valid() and user_form.is_valid():
-            user_form.save()
-            profile_form.save()
+    def get_object(self, queryset=None):
+        updated_user = User.objects.get(username=self.kwargs["username"])
 
-            messages.success(request, 'Your profile has been updated successfully')
-
-            return redirect('accounts:userprofile', username=change_profile.username)
-        else:
-            context = {
-                'user_form': user_form,
-                'profile_form': profile_form
-            }
-            messages.error(request, 'Error updating you profile')
-
-            return render(request, 'accounts/profile_update_form.html', context)
+        return Profile.objects.get(user=updated_user)
 
     def test_func(self):
         user = self.request.user
-        change_profile = User.objects.get(username=self.kwargs["username"])
-
-        return user.is_superuser or user.is_staff or user == change_profile
+        updated_user = self.get_object().user
+        print(user, updated_user)
+        return user.is_superuser or user.is_staff or user == updated_user
 
 
 class UsersListView(LoginRequiredMixin, ListView):
@@ -121,16 +129,16 @@ class UsersListView(LoginRequiredMixin, ListView):
 
 
 class UserProfileView(View):
-    template_name = 'accounts/other_userprofile.html'
-    context_object_name = "userprofile"
-    queryset = User.objects.select_related("profile").all()
+    template_name = 'accounts/userprofile.html'
 
     def get(self, request, *args, **kwargs):
         view_profile = User.objects.get(username=kwargs["username"])
+        user = self.request.user
         user_form = UserInfoForm(instance=view_profile)
         context = {
             'user_form': user_form,
-            'view_profile': view_profile
+            'view_profile': view_profile,
+            'user': user
         }
 
         return render(request, 'accounts/userprofile.html', context)
