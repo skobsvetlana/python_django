@@ -7,31 +7,29 @@
 
 {% block body %}
 <div class="center">
+	{% if update_profile.profile %}
+		<img src="{{update_profile.profile.avatar.url}}" alt="{{ update_profile.username }}" class="avatar"  accept=".jpg,.jpeg,.png"/>
+	{% endif %}
 
-	<form method="POST" enctype="multipart/form-data" class="card">
+	<h2 class="text-center">{{update_profile.username | title }}</h2>
+	<p class="text-center"><a>{{update_profile.profile.bio}}</a></p>
+	<hr>
+
+	<form method="post" enctype="multipart/form-data">
 		{% csrf_token %}
-
-	    {% if update_profile.profile %}
-			<img src="{{update_profile.profile.avatar.url}}" alt="{{ update_profile.username }}" class="avatar"  accept=".jpg,.jpeg,.png"/>
-	    {% endif %}
-
-	    <h2 class="text-center">{{update_profile.username | title }}</h2>
-	    <p class="text-center"><a>{{update_profile.profile.bio}}</a></p>
-   	    <hr>
-			<label for="username">Username:</label>
-            <input type="text" id="username" name="username" value="{{update_profile.username}}" />
-
-
-            <label for="bio">Bio:</label>
-            <input type="text" id="bio" name="bio" value="{{update_profile.profile.bio}}" />
+		 <label for="bio">Bio:</label>
+		<input type="text" id="bio" name="bio" value="{{update_profile.profile.bio}}" />
 
 
 		<label for="avatar">Avatar:</label>
 		<input type="file" name="avatar" id="avatar">
 
-	    <button type="submit" class="btn btn-primary full-width">Update Profile</button>
+
+		<button type="submit">
+			Update Profile
+		</button>
 		<button type="button">
-			<a href="{% url 'accounts:userprofile' username=update_profile.username %}">Cancel</a>
+		<a href="{% url 'accounts:userprofile' username=update_profile.username %}">Cancel</a>
 		</button>
 
 	</form>

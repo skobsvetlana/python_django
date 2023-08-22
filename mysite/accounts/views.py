@@ -15,7 +15,8 @@ from django.views.generic import TemplateView, CreateView, UpdateView, ListView
 from django.views import View
 from django.shortcuts import get_object_or_404
 
-from .forms import ProfileUpdateForm, UserUpdateForm, UserInfoForm
+# from .forms import ProfileUpdateForm, UserUpdateForm, \
+from .forms import UserInfoForm
 from .models import Profile
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -66,49 +67,20 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     #permission_required = 'accounts.change_avatar'
     template_name = "accounts/profile_update_form.html"
     model = Profile
-    fields = "user", "bio",  "avatar",
-    success_url = reverse_lazy("accounts:profile_update")
+    fields = "bio",  "avatar",
 
     def get(self, request, *args, **kwargs):
         update_profile = User.objects.get(username=kwargs["username"])
-        # user_form = UserUpdateForm(instance=update_profile)
-        # profile_form = ProfileUpdateForm(instance=update_profile)
-
         context = {
-            # 'user_form': user_form,
-            # 'profile_form': profile_form,
             'update_profile': update_profile,
         }
 
         return render(request, 'accounts/profile_update_form.html', context)
 
-    # def post(self, request, *args, **kwargs):
-    #     change_profile = User.objects.get(username=kwargs["username"])
-    #     user_form = UserUpdateForm(
-    #         request.POST,
-    #         instance=change_profile
-    #     )
-    #     profile_form = ProfileUpdateForm(
-    #         request.POST,
-    #         request.FILES,
-    #         instance=change_profile.profile
-    #     )
-    #
-    #     if profile_form.is_valid() and user_form.is_valid():
-    #         user_form.save()
-    #         profile_form.save()
-    #
-    #         messages.success(request, 'Your profile has been updated successfully')
-    #
-    #         return redirect('accounts:userprofile', username=change_profile.username)
-    #     else:
-    #         context = {
-    #             'user_form': user_form,
-    #             'profile_form': profile_form
-    #         }
-    #         messages.error(request, 'Error updating you profile')
-    #
-    #         return render(request, 'accounts/profile_update_form.html', context)
+    def get_success_url(self, *args, **kwargs):
+        updated_user = self.get_object().user
+
+        return reverse("accounts:userprofile", kwargs={'username': updated_user})
 
     def get_object(self, queryset=None):
         updated_user = User.objects.get(username=self.kwargs["username"])
@@ -118,7 +90,7 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         user = self.request.user
         updated_user = self.get_object().user
-        print(user, updated_user)
+
         return user.is_superuser or user.is_staff or user == updated_user
 
 
