@@ -15,8 +15,8 @@ from django.views.generic import TemplateView, CreateView, UpdateView, ListView
 from django.views import View
 from django.shortcuts import get_object_or_404
 
-# from .forms import ProfileUpdateForm, UserUpdateForm, \
-from .forms import UserInfoForm
+# from .forms import UserUpdateForm,
+from .forms import UserInfoForm, ProfileUpdateForm
 from .models import Profile
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -27,8 +27,7 @@ class UserInfoView(TemplateView):
 
 class AboutMeView(UpdateView):
     template_name = "accounts/about-me.html"
-    model = Profile
-    fields = "avatar",
+    form_class = ProfileUpdateForm
     success_url = reverse_lazy("accounts:about_me")
 
     def get_object(self, queryset=None):
@@ -88,8 +87,8 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return Profile.objects.get(user=updated_user)
 
     def test_func(self):
-        user = self.request.user
-        updated_user = self.get_object().user
+        user = self.request.user.pk
+        updated_user = self.get_object().user.pk
 
         return user.is_superuser or user.is_staff or user == updated_user
 

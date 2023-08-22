@@ -29,14 +29,14 @@ class UserInfoForm(ModelForm):
 #         fields = ('username',)
 #
 #
-# class ProfileUpdateForm(forms.ModelForm):
-#     avatar = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control-file'}))
-#     bio = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5}))
-#
-#     class Meta:
-#         model = Profile
-#         fields = ['avatar', 'bio']
-#         #fields = '__all__'
+class ProfileUpdateForm(forms.ModelForm):
+    avatar = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control-file'}))
+    #bio = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5}))
+
+    class Meta:
+        model = Profile
+        fields = ['avatar',]
+        #fields = '__all__'
 #
 #
 #
