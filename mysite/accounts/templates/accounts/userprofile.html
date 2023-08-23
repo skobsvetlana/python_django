@@ -7,23 +7,23 @@
 
 {% block body %}
     <h1> Profile </h1>
-        <p>Username: {{ view_profile.username }}</p>
-        <p>First name: {{ view_profile.first_name }}</p>
-        <p>Last name: {{ view_profile.last_name }}</p>
-        <p>Email: {{ view_profile.email }}</p>
-        <p>Bio: {{ view_profile.profile.bio }}</p>
+        <p>Username: {{ user_profile.username }}</p>
+        <p>First name: {{ user_profile.first_name }}</p>
+        <p>Last name: {{ user_profile.last_name }}</p>
+        <p>Email: {{ user_profile.email }}</p>
+        <p>Bio: {{ user_profile.profile.bio }}</p>
 
         <div>
-            {% if view_profile.profile.avatar%}
-            <img src="{{ view_profile.profile.avatar.url }}" alt="{{ view_profile.profile.avatar.name }}">
+            {% if user_profile.profile.avatar%}
+            <img src="{{ user_profile.profile.avatar.url }}" alt="{{ user_profile.profile.avatar.name }}">
             {% else %}
             Avatar: no avatar
             {% endif %}
         </div>
     <br><br>
     <div>
-        {% if perms.accounts.change_avatar or user.is_staff or view_profile.username == user.username %}
-        <a href="{% url 'accounts:profile_update' username=view_profile.username%}">
+        {% if perms.accounts.change_avatar or user.is_staff or user_profile.pk == user.pk %}
+        <a href="{% url 'accounts:profile_update' pk=user_profile.pk %}">
             Update profile </a>
         {% endif %}
     </div>

@@ -11,7 +11,7 @@ from django.http import HttpRequest, HttpResponse, JsonResponse, HttpResponseRed
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse, reverse_lazy
-from django.views.generic import TemplateView, CreateView, UpdateView, ListView
+from django.views.generic import TemplateView, CreateView, UpdateView, ListView, DetailView
 from django.views import View
 from django.shortcuts import get_object_or_404
 
@@ -31,7 +31,8 @@ class AboutMeView(UpdateView):
     success_url = reverse_lazy("accounts:about_me")
 
     def get_object(self, queryset=None):
-        return Profile.objects.get(pk=self.request.user.pk)
+
+        return self.request.user.profile
 
 
 class RegisterView(CreateView):
@@ -69,28 +70,18 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     fields = "bio",  "avatar",
 
     def get(self, request, *args, **kwargs):
-        update_profile = User.objects.get(username=kwargs["username"])
+        update_profile = User.objects.get(pk=self.kwargs["pk"])
         context = {
             'update_profile': update_profile,
         }
-
+        print(context)
         return render(request, 'accounts/profile_update_form.html', context)
 
-    def get_success_url(self, *args, **kwargs):
+    def test_func(self):
+        user = self.request.user
         updated_user = self.get_object().user
 
-        return reverse("accounts:userprofile", kwargs={'username': updated_user})
-
-    def get_object(self, queryset=None):
-        updated_user = User.objects.get(username=self.kwargs["username"])
-
-        return Profile.objects.get(user=updated_user)
-
-    def test_func(self):
-        user = self.request.user.pk
-        updated_user = self.get_object().user.pk
-
-        return user.is_superuser or user.is_staff or user == updated_user
+        return user.is_superuser or user.is_staff or user.pk == updated_user.pk
 
 
 class UsersListView(LoginRequiredMixin, ListView):
@@ -99,17 +90,17 @@ class UsersListView(LoginRequiredMixin, ListView):
     queryset = User.objects.select_related("profile").all()
 
 
-class UserProfileView(View):
+class UserProfileView(DetailView):
     template_name = 'accounts/userprofile.html'
+    form_class = UserInfoForm
+    #queryset = Profile.objects.select_related("user").all()
 
     def get(self, request, *args, **kwargs):
-        view_profile = User.objects.get(username=kwargs["username"])
+        user_profile = User.objects.get(pk=self.kwargs["pk"])
         user = self.request.user
-        user_form = UserInfoForm(instance=view_profile)
         context = {
-            'user_form': user_form,
-            'view_profile': view_profile,
-            'user': user
+            'user': user,
+            'user_profile': user_profile,
         }
 
         return render(request, 'accounts/userprofile.html', context)

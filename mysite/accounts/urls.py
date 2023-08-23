@@ -37,9 +37,9 @@ urlpatterns = [
     #path("login/", MyLoginView.as_view(), name="login"),
     path("user_info/", UserInfoView.as_view(), name="user_info"),
     path("about-me/", AboutMeView.as_view(), name="about_me"),
-    path("<username>/update/", ProfileUpdateView.as_view(), name="profile_update"),
+    path("<pk>/update/", ProfileUpdateView.as_view(), name="profile_update"),
     path("users/", UsersListView.as_view(), name="users_list"),
-    path("<username>/", UserProfileView.as_view(), name="userprofile"),
+    path("<pk>/", UserProfileView.as_view(), name="userprofile"),
     path("register/", RegisterView.as_view(), name="register"),
 
     path("cookie/get/", get_cookie_view, name="cookie_get"),

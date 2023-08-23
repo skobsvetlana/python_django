@@ -13,7 +13,7 @@
       {% for user in users %}
         <div>
           <p>
-            <a href="{% url 'accounts:userprofile' username=user.username %}">
+            <a href="{% url 'accounts:userprofile' pk=user.pk %}">
               {{ user.username }}
             </a>
             {% if user.profile.avatar %}
@@ -27,14 +27,5 @@
 
   {% endif %}
   </div>
-
-<!--    {% if perms.shopapp.add_product %}-->
-<!--    <div>-->
-<!--      <a href="{% url 'shopapp:create_product' %}">-->
-<!--        Create a new product-->
-<!--      </a>-->
-<!--    </div>-->
-<!--  {% endif %}-->
-
 
 {% endblock %}
