@@ -74,7 +74,7 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context = {
             'update_profile': update_profile,
         }
-        print(context)
+
         return render(request, 'accounts/profile_update_form.html', context)
 
     def test_func(self):
