@@ -4,6 +4,7 @@ from django.urls import path
 from .views import (
     #login_view,
     #logout_view,
+    HelloView,
     MyLogoutView,
     get_cookie_view,
     set_cookie_view,
@@ -23,6 +24,7 @@ from .views import (
 app_name = "accounts"
 
 urlpatterns = [
+    path("hello/", HelloView.as_view(), name="hello"),
     #path("login/", login_view, name="login"),
     #path("logout/", logout_view, name="logout"),
     path("logout/", MyLogoutView.as_view(), name="logout"),

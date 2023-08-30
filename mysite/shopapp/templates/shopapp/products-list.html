@@ -1,29 +1,32 @@
 {% extends 'shopapp/base.html' %}
 
+{% load i18n %}
+
 {% block title %}
-    Products list
+    {% translate "Products list" %}
 {% endblock %}
 
 {% block body %}
-  <h1>Products:</h1>
+  <h1>{% translate "Products" %}:</h1>
   {% if not products %}
-    <h3> There is no products yet </h3>
+    <h3> {% translate "There is no products yet" %} </h3>
   {% else %}
   <div>
       {% for product in products %}
         <div>
           <p>
             <a href="{% url 'shopapp:product_details' pk=product.pk %}">
-              Name: {{ product.name }}
+              {% translate "Name" context 'product name' %}: {{ product.name }}
             </a>
-            price: {{ product.price }},
-            quantity: {{product.quantity }},
-            discount: {% firstof product.discount 'no discount' %}
-            created by: {{ product.created_by }}
+            {% translate "price" %}: {{ product.price }},
+            {% translate "quantity" %}: {{product.quantity }},
+            {% translate "no discount" as no_discount %}
+            {% translate "discount" %}: {% firstof product.discount no_discount %},
+            {% translate "created by" %}: {{ product.created_by }}
             {% if product.preview %}
             <img src="{{ product.preview.url }}" alt="{{ product.preview.name }}">
             {% else %}
-            preview: no image
+            {% translate "preview: no image" %}
             {% endif %}
           </p>
         </div>
@@ -35,7 +38,7 @@
   {% if perms.shopapp.add_product %}
     <div>
       <a href="{% url 'shopapp:create_product' %}">
-        Create a new product
+        {% translate "Create a new product" %}
       </a>
     </div>
   {% endif %}

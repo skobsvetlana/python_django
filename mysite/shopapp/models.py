@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
 
 from mysite import settings
 
@@ -12,6 +13,7 @@ def product_preview_directory_path(instance: "Product", filename: str) -> str:
 class Product(models.Model):
     class Meta:
         ordering = ["name", "price"]
+        #verbose_name = _("Product")
         #verbose_name_plural = "products"
         #db_table = "tech_products"
 
