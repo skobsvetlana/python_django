@@ -54,6 +54,10 @@ class ProductImages(models.Model):
 
 
 class Order(models.Model):
+    class Mete:
+        verbose_name = _("Order")
+        verbose_name_plural = _("Orders")
+
     delivery_address = models.TextField(null=False, blank=True)
     promocode = models.CharField(max_length=20, null=False, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

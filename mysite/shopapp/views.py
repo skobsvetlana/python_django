@@ -35,6 +35,7 @@ class ShopIndexView(View):
             "cities": cities,
             "greeting_str": greeting_str,
             "num_messages": num_messages,
+            "items": 5,
         }
 
         return render(request, 'shopapp/shop_index.html', context=context)
