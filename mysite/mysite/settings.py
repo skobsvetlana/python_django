@@ -38,17 +38,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     "django_rename_app",
+    "rest_framework",
+    "django_filters",
 
     'shopapp.apps.ShopappConfig',
     'requestdataapp.apps.RequestdataappConfig',
     'accounts.apps.AccountsConfig',
-    'crispy_forms',
-    'crispy_bootstrap4',
-
+    'myapiapp.apps.MyapiappConfig',
 ]
-
-#CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -165,3 +164,11 @@ LOGIN_URL = reverse_lazy("accounts:login")
 
 AUTH_PROFILE_MODULE = "models.Profile"
 #AUTH_USER_MODEL = 'auth.User'
+
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ],
+}
