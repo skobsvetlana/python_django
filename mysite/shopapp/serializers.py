@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
-from .models import Product
+from .models import Product, Order
 
 class ProductSerializer(ModelSerializer):
     class Meta:
@@ -16,4 +16,16 @@ class ProductSerializer(ModelSerializer):
             "created_by",
             "archived",
             "preview",
+        )
+
+
+class OrderSerializer(ModelSerializer):
+    class Meta:
+        model = Order
+        fields = (
+            "pk",
+            "delivery_address",
+            "promocode",
+            "created_at",
+            "user",
         )
