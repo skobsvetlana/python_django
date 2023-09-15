@@ -1,7 +1,13 @@
-from time import sleep
+"""
+В этом модуле лежат различные наборы представлений.
+
+Разные view для интернет магазина: по товарам, заказам и т.д.
+"""
+
 from timeit import default_timer
 
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.models import Group
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
@@ -17,7 +23,14 @@ from shopapp.serializers import ProductSerializer, OrderSerializer
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter, OrderingFilter
 
+from drf_spectacular.utils import extend_schema, OpenApiResponse
+
+@extend_schema(description='Product views CRUD')
 class ProductViewSet(ModelViewSet):
+    """
+    Набор представлений над Product
+    Полный CRUD для сущностей товара
+    """
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [
@@ -38,6 +51,17 @@ class ProductViewSet(ModelViewSet):
         "price",
         "discount",
         ]
+
+    @extend_schema(
+        summary='Get one product by ID',
+        description='Retrieves **product**, returns 404 if not found',
+        responses={
+            200: ProductSerializer,
+            400: OpenApiResponse(description='Empty response, product by id not found'),
+        }
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(*args, **kwargs)
 
 
 class OrderViewSet(ModelViewSet):
