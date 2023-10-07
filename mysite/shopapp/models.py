@@ -17,8 +17,8 @@ class Product(models.Model):
         verbose_name_plural = "products"
         #db_table = "tech_products"
 
-    name = models.CharField(max_length=100)
-    description = models.TextField(null=False, blank=True)
+    name = models.CharField(max_length=100, db_index=True)
+    description = models.TextField(null=False, blank=True, db_index=True)
     quantity = models.PositiveIntegerField(default=0)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.PositiveSmallIntegerField(default=0)
