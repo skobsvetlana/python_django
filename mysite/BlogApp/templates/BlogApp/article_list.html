@@ -1,0 +1,35 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}
+    Articles list
+{% endblock %}
+
+{% block body %}
+  <h1>Articles:</h1>
+  {% if not object_list %}
+    <h3> There is no articles yet </h3>
+  {% else %}
+  <div>
+    {% for article in articles %}
+      <div>
+        <p>
+          title: {{ article.title }},
+          publication date: {{ article.pub_date }},
+          author: {{ article.author.name }},
+          category: {{ article.category.name }},
+          <p>
+            tags:
+            {% for tag in article.tags.all %}
+            {{ tag.name }},
+            {% endfor %}
+          </p>
+        </p>
+        <p>
+          {{ article.content }}
+        </p>
+        <br>
+        <div>
+    {% endfor %}
+  {% endif %}
+  </div>
+{% endblock %}

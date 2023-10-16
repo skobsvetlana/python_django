@@ -35,6 +35,7 @@ urlpatterns = [
 urlpatterns += i18n_patterns(
     path('accounts/', include('accounts.urls')),
     path('shop/', include('shopapp.urls')),
+    path('blogapp/', include('BlogApp.urls')),
 )
 
 if settings.DEBUG:
