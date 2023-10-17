@@ -185,6 +185,7 @@ SPECTACULAbnR_SETTINGS = {
 
 LOGGING = {
     'version': 1,
+    'diable_existing_loggers': False,
     'filters': {
         'require_debug_true': {
             '()': 'django.utils.log.RequireDebugTrue',
@@ -203,4 +204,7 @@ LOGGING = {
             'handlers': ['console'],
         },
     },
+    'root': {
+        'handlers': ['console'],
+    }
 }
