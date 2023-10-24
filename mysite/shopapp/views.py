@@ -247,6 +247,11 @@ class ProductsDataExportView(View):
             }
             for product in products
         ]
+
+        # el = products_data[0]
+        # name = el["naem"]
+        # print("name:", name)
+
         return JsonResponse({"products": products_data})
 
 
