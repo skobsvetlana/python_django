@@ -4,6 +4,8 @@
 Разные view для интернет магазина: по товарам, заказам и т.д.
 """
 
+import logging
+
 from timeit import default_timer
 
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
@@ -24,6 +26,8 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter, OrderingFilter
 
 from drf_spectacular.utils import extend_schema, OpenApiResponse
+
+log = logging.getLogger(__name__)
 
 @extend_schema(description='Product views CRUD')
 class ProductViewSet(ModelViewSet):
@@ -109,6 +113,9 @@ class ShopIndexView(View):
             "num_messages": num_messages,
             "items": 5,
         }
+
+        log.debug("Products for shop index: %s", products)
+        log.info("Rendering shop index")
 
         return render(request, 'shopapp/shop_index.html', context=context)
 
