@@ -31,6 +31,7 @@ class ProductInline(admin.StackedInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin, ExportAsCSVMixin):
+    change_list_template = "shopapp/products_changelist.html"
     actions = [
         mark_archived,
         mark_unarchived,
@@ -125,6 +126,7 @@ class ProductInline(admin.StackedInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    change_list_template = "shopapp/orders_changelist.html"
     inlines = [
         ProductInline,
     ]
