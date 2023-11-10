@@ -5,6 +5,7 @@
 """
 
 import logging
+from csv import DictWriter
 
 from timeit import default_timer
 
@@ -16,8 +17,10 @@ from django.contrib.syndication.views import Feed
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.views import View
+from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django_filters.rest_framework import DjangoFilterBackend
+from django.utils.decorators import method_decorator
 
 from shopapp.forms import ProductForm, OrderForm, GroupForm
 from shopapp.models import Product, Order, ProductImages
@@ -25,6 +28,7 @@ from shopapp.serializers import ProductSerializer, OrderSerializer
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.decorators import action
 
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
@@ -78,6 +82,36 @@ class ProductViewSet(ModelViewSet):
         "discount",
         ]
 
+    @method_decorator(cache_page(60 * 3))
+    def list(self, *args, **kwargs):
+        #print("Hello products list")
+        return super(ProductViewSet, self).list(*args, **kwargs)
+
+    # @action(methods=['get'], detail=False)
+    # def download_csv(self, request: Request):
+    #     response = HttpResponse(content_type="text/csv")
+    #     filename = "products_export.csv"
+    #     response["Content-Disposition"] = f"attachment; filename={filename}"
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #     fields = [
+    #         "name",
+    #         "description",
+    #         "price",
+    #         "discount",
+    #         "created_at",
+    #         "created_by",
+    #         "archived",
+    #     ]
+    #     queryset = queryset.only(*fields)
+    #     writer = DictWriter(response, fieldnames=fields)
+    #     writer.writeheader()
+    #
+    #     for product in queryset:
+    #         writer.writerow({
+    #             field: getattr(product, field)
+    #             for field in fields
+    #         })
+
     @extend_schema(
         summary='Get one product by ID',
         description='Retrieves **product**, returns 404 if not found',
@@ -112,6 +146,7 @@ class OrderViewSet(ModelViewSet):
 
 
 class ShopIndexView(View):
+    @method_decorator(cache_page(60 * 3))
     def get(self, request: HttpRequest) -> HttpResponse:
         products = [
             ('Laptop', 1999),
