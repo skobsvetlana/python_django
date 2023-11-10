@@ -12,6 +12,7 @@ from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.models import Group
+from django.contrib.syndication.views import Feed
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.views import View
