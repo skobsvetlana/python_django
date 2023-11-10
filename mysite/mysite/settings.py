@@ -205,7 +205,7 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
-SPECTACULAbnR_SETTINGS = {
+SPECTACULAR_SETTINGS = {
     "TITLE": "My site Project API",
     "DESCRIPTION": "My site with shop app and custom auth",
     "VERSION": "1.0.0",
@@ -231,7 +231,7 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            #'level': 'DEBUG',
+            'level': 'DEBUG',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
@@ -245,12 +245,12 @@ LOGGING = {
             'formatter': 'verbose',
         },
     },
-    # 'loggers': {
-    #     'django.db.backends': {
-    #         'level': 'DEBUG',
-    #         'handlers': ['console'],
-    #     },
-    # },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+        },
+    },
     'root': {
         'handlers': [
             'console',
