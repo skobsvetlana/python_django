@@ -49,7 +49,6 @@ class GroupForm(ModelForm):
         fields = "name",
 
 
-
 # class ProductForm(forms.Form):
 #     name = forms.CharField(max_length=100)
 #     description = forms.CharField(
@@ -64,3 +63,5 @@ class GroupForm(ModelForm):
 #     price = forms.DecimalField(min_value=0, max_value=10000000, decimal_places=2)
 
 
+class CSVImportForm(forms.Form):
+    csv_file = forms.FileField()
