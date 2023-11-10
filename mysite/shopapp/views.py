@@ -29,6 +29,27 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 log = logging.getLogger(__name__)
 
+class LatestProductsFeed(Feed):
+    title = "Shop products (latest)"
+    description = "Updates on changes and addition shop products"
+    link = reverse_lazy("shopapp:products_list")
+
+    def items(self):
+        return (
+        Product.objects
+        .filter(archived__isnull=False)
+        .order_by("-created_at")[:5]
+    )
+
+    def item_title(self, item: Product):
+        return item.name
+
+    def item_description(self, item: Product):
+        return item.description[:200]
+
+    def item_link(self, item: Product):
+        return reverse("shopapp:product_details", kwargs={"pk": item.pk})
+
 @extend_schema(description='Product views CRUD')
 class ProductViewSet(ModelViewSet):
     """
