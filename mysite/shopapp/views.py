@@ -12,7 +12,7 @@ from timeit import default_timer
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, reverse, get_object_or_404
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.contrib.syndication.views import Feed
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
@@ -21,6 +21,7 @@ from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.decorators import method_decorator
+from django.core.cache import cache
 
 from shopapp.forms import ProductForm, OrderForm, GroupForm
 from shopapp.models import Product, Order, ProductImages
@@ -33,6 +34,63 @@ from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 log = logging.getLogger(__name__)
+
+class UserOrdersListView(LoginRequiredMixin, ListView):
+    template_name = 'shopapp/user_orders.html'
+    model = Order
+
+    def get_queryset(self, *args, **kwargs):
+        user_id = self.kwargs['user_id']
+        self.owner = get_object_or_404(User, pk=user_id)
+        queryset = (
+            Order.objects
+            .select_related("user")
+            .prefetch_related("products").filter(user=self.owner)
+        )
+
+        return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["owner"] = self.owner
+
+        return context
+
+
+class UserOrdersExportView(LoginRequiredMixin, ListView):
+    def get_queryset(self, *args, **kwargs):
+        user_id = self.kwargs['user_id']
+        user = get_object_or_404(User, pk=user_id)
+        queryset = (
+            Order.objects
+            .order_by("pk")
+            .select_related("user")
+            .prefetch_related("products").filter(user=user)
+        )
+
+        return queryset
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> JsonResponse:
+        user_id = self.kwargs['user_id']
+        cache_key = f"user{user_id}_orders_data_export"
+        orders_data = cache.get(cache_key)
+        if orders_data is None:
+            orders = self.get_queryset()
+            orders_data = [
+                {
+                    "pk": order.pk,
+                    "delivery_address": order.delivery_address,
+                    "promocode": order.promocode,
+                    "created_at": str(order.created_at),
+                    "user": order.user.username,
+                    "products": [product.name for product in order.products.all()],
+                }
+                for order in orders
+            ]
+            cache.set(cache_key, orders_data, 300)
+
+        return JsonResponse({"orders": orders_data})
+
 
 class LatestProductsFeed(Feed):
     title = "Shop products (latest)"
@@ -146,7 +204,7 @@ class OrderViewSet(ModelViewSet):
 
 
 class ShopIndexView(View):
-    @method_decorator(cache_page(60 * 3))
+    #@method_decorator(cache_page(60 * 3))
     def get(self, request: HttpRequest) -> HttpResponse:
         products = [
             ('Laptop', 1999),
@@ -294,19 +352,22 @@ class ProductArchiveView(PermissionRequiredMixin, DeleteView):
 
 class ProductsDataExportView(View):
     def get(self, request: HttpRequest) -> JsonResponse:
-        products = Product.objects.order_by("pk").all()
-        products_data = [
-            {
-                "pk": product.pk,
-                "name": product.name,
-                "description": product.description,
-                "quantity": product.quantity,
-                "price": str(product.price),
-                "archived": product.archived,
-            }
-            for product in products
-        ]
-
+        cache_key = "products_data_export"
+        products_data = cache.get(cache_key)
+        if products_data is None:
+            products = Product.objects.order_by("pk").all()
+            products_data = [
+                {
+                    "pk": product.pk,
+                    "name": product.name,
+                    "description": product.description,
+                    "quantity": product.quantity,
+                    "price": str(product.price),
+                    "archived": product.archived,
+                }
+                for product in products
+            ]
+            cache.set(cache_key, products_data, 300)
         # el = products_data[0]
         # name = el["naem"]
         # print("name:", name)
@@ -367,9 +428,6 @@ class OrderDeleteView(PermissionRequiredMixin, DeleteView):
 
 
 class OrdersExportView(UserPassesTestMixin, ListView):
-    template_name = 'shopapp/order-export.html'
-    context_object_name = "export_orders"
-
     def test_func(self):
         return self.request.user.is_staff
 

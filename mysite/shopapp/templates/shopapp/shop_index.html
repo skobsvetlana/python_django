@@ -1,4 +1,5 @@
 {% extends 'shopapp/base.html' %}
+{% load cache %}
 
 {% block title %}
     Shop Index
@@ -25,9 +26,11 @@
         Time running: {{ time_running }}
     </div>
 
+    {% cache 100 lorem %}
     <div>
         {% lorem 3 p random %}
     </div>
+    {% endcache %}
 
     {% regroup cities by country as country_list %}
 
