@@ -30,6 +30,7 @@ from shopapp.serializers import ProductSerializer, OrderSerializer
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.decorators import action
+from rest_framework.request import Request
 
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
@@ -145,30 +146,32 @@ class ProductViewSet(ModelViewSet):
         #print("Hello products list")
         return super(ProductViewSet, self).list(*args, **kwargs)
 
-    # @action(methods=['get'], detail=False)
-    # def download_csv(self, request: Request):
-    #     response = HttpResponse(content_type="text/csv")
-    #     filename = "products_export.csv"
-    #     response["Content-Disposition"] = f"attachment; filename={filename}"
-    #     queryset = self.filter_queryset(self.get_queryset())
-    #     fields = [
-    #         "name",
-    #         "description",
-    #         "price",
-    #         "discount",
-    #         "created_at",
-    #         "created_by",
-    #         "archived",
-    #     ]
-    #     queryset = queryset.only(*fields)
-    #     writer = DictWriter(response, fieldnames=fields)
-    #     writer.writeheader()
-    #
-    #     for product in queryset:
-    #         writer.writerow({
-    #             field: getattr(product, field)
-    #             for field in fields
-    #         })
+    @action(methods=['get'], detail=False)
+    def download_csv(self, request: Request):
+        response = HttpResponse(content_type="text/csv")
+        filename = "products_export.csv"
+        response["Content-Disposition"] = f"attachment; filename={filename}"
+        queryset = self.filter_queryset(self.get_queryset())
+        fields = [
+            "name",
+            "description",
+            "price",
+            "discount",
+            "created_at",
+            "created_by",
+            "archived",
+        ]
+        queryset = queryset.only(*fields)
+        writer = DictWriter(response, fieldnames=fields)
+        writer.writeheader()
+
+        for product in queryset:
+            writer.writerow({
+                field: getattr(product, field)
+                for field in fields
+            })
+
+        return response
 
     @extend_schema(
         summary='Get one product by ID',
