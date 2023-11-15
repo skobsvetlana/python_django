@@ -10,6 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import sys
+import logging.config
+
+from os import getenv
 from pathlib import Path
 
 from django.urls import reverse_lazy
@@ -37,7 +40,11 @@ DATABASE_DIR.mkdir(exist_ok=True)
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-jft3ac@pru#gw-=fw%tt(uaph+(&-%0tk+=qb$b9k=bm8s7r^-'
+SECRET_KEY = getenv(
+    "DJANGO_SECRET_KEY",
+    'django-insecure-jft3ac@pru#gw-=fw%tt(uaph+(&-%0tk+=qb$b9k=bm8s7r^-',
+)
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -209,6 +216,29 @@ LOGIN_URL = reverse_lazy("accounts:login")
 AUTH_PROFILE_MODULE = "models.Profile"
 #AUTH_USER_MODEL = 'auth.User'
 
+LOGLEVEL = getenv("DJANGO_LOGLEVEL", "info").upper()
+logging.config.dictConfig({
+    "version": 1,  # the dictConfig format version
+    "disable_existing_loggers": False,  # retain the default loggers
+    'formatters': {
+        'console': {
+            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+    },
+    'loggers': {
+        '': {
+            'level': LOGLEVEL,
+            'handlers': ['console'],
+        },
+    },
+})
+
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
@@ -229,46 +259,46 @@ LOGFILE_NAME = BASE_DIR / "log.txt"
 LOGFILE_SIZE = 1 * 1024 * 1024
 LOGFILE_COUNT = 3
 
-LOGGING = {
-    "version": 1,  # the dictConfig format version
-    "disable_existing_loggers": False,  # retain the default loggers
-    'formatters': {
-        'verbose': {
-            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
-        },
-    },
-    'filters': {
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-        'logfile': {
-            #'class': "logging.handlers.TimeRotatingFileHandler",
-            'class': "logging.handlers.RotatingFileHandler",
-            'filename': LOGFILE_NAME,
-            'maxBytes': LOGFILE_SIZE,
-            'backupCount': LOGFILE_COUNT,
-            'formatter': 'verbose',
-        },
-    },
-    'loggers': {
-        'django.db.backends': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-        },
-    },
-    'root': {
-        'handlers': [
-            'console',
-            'logfile'
-        ],
-        'level': 'DEBUG',
-    },
-}
+# LOGGING = {
+#     "version": 1,  # the dictConfig format version
+#     "disable_existing_loggers": False,  # retain the default loggers
+#     'formatters': {
+#         'verbose': {
+#             'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+#         },
+#     },
+#     'filters': {
+#         'require_debug_true': {
+#             '()': 'django.utils.log.RequireDebugTrue',
+#         },
+#     },
+#     'handlers': {
+#         'console': {
+#             'level': 'DEBUG',
+#             'filters': ['require_debug_true'],
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'verbose',
+#         },
+#         'logfile': {
+#             #'class': "logging.handlers.TimeRotatingFileHandler",
+#             'class': "logging.handlers.RotatingFileHandler",
+#             'filename': LOGFILE_NAME,
+#             'maxBytes': LOGFILE_SIZE,
+#             'backupCount': LOGFILE_COUNT,
+#             'formatter': 'verbose',
+#         },
+#     },
+#     'loggers': {
+#         'django.db.backends': {
+#             'level': 'DEBUG',
+#             'handlers': ['console'],
+#         },
+#     },
+#     'root': {
+#         'handlers': [
+#             'console',
+#             'logfile'
+#         ],
+#         'level': 'DEBUG',
+#     },
+# }
