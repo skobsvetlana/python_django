@@ -135,3 +135,16 @@ dmypy.json
 /test.py
 /mysite/test.py
 /mysite/db_test.sqlite3
+/DRF/
+/i18n_l10n/
+/M_01_LinuxIntro/
+/M_02_DjangoIntro/
+/M_03_DatabaseAndModels/
+/M_04_DjangoAdmin/
+/M_05_RequestsAndMiddlewares/
+/M_06_Forms/
+/M_07_CBV/
+/M_08_Auth/
+/M_09_permissions/
+/M_10_Testing/
+/M_11_Files/
